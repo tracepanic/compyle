@@ -9,7 +9,6 @@ import { createCommentSchema } from "@/schema/comment.schema";
 import { getUserFromAuth } from "@/server/user";
 import { and, desc, eq, isNotNull, isNull, lt } from "drizzle-orm";
 import z, { ZodError } from "zod";
-import { notifications } from "@/db/schemas/notification";
 
 export async function addComment(
   appId: string,
@@ -105,8 +104,6 @@ export async function deleteCommentAsAppOwner({
     const result = await db
       .select({
         commentId: comments.id,
-        commentUserId: comments.userId,
-        appSlug: apps.slug,
       })
       .from(comments)
       .innerJoin(apps, eq(comments.appId, apps.id))
@@ -132,14 +129,6 @@ export async function deleteCommentAsAppOwner({
         deleteReason: reason,
       })
       .where(eq(comments.id, commentId));
-
-    await db.insert(notifications).values({
-      userId: result[0].commentUserId,
-      title: "Comment Deleted",
-      message: `Your comment was deleted. Reason: ${reason}`,
-      type: "warning",
-      link: `/dashboard/comments`,
-    });
 
     return true;
   } catch (error) {
@@ -181,10 +170,10 @@ export async function getAppComments({
     // Build where conditions using join with apps table
     const whereConditions = cursor
       ? and(
-        eq(apps.slug, appSlug),
-        lt(comments.createdAt, new Date(cursor)),
-        isNull(comments.deletedAt),
-      )
+          eq(apps.slug, appSlug),
+          lt(comments.createdAt, new Date(cursor)),
+          isNull(comments.deletedAt),
+        )
       : and(eq(apps.slug, appSlug), isNull(comments.deletedAt));
 
     const appComments = await db
@@ -266,16 +255,16 @@ export async function getAppCommentsAdmin({
 
     const whereConditions = cursor
       ? and(
-        eq(comments.appId, appId),
-        eq(apps.userId, user.id),
-        lt(comments.createdAt, new Date(cursor)),
-        isNull(comments.deletedAt),
-      )
+          eq(comments.appId, appId),
+          eq(apps.userId, user.id),
+          lt(comments.createdAt, new Date(cursor)),
+          isNull(comments.deletedAt),
+        )
       : and(
-        eq(comments.appId, appId),
-        eq(apps.userId, user.id),
-        isNull(comments.deletedAt),
-      );
+          eq(comments.appId, appId),
+          eq(apps.userId, user.id),
+          isNull(comments.deletedAt),
+        );
 
     const appComments = await db
       .select({
@@ -382,10 +371,10 @@ export async function getDeletedCommentsByAppOwner({
     // Build where conditions for deleted comments by app owner
     const whereConditions = cursor
       ? and(
-        eq(comments.appId, appId),
-        eq(comments.deleter, "appOwner"),
-        lt(comments.deletedAt, new Date(cursor)),
-      )
+          eq(comments.appId, appId),
+          eq(comments.deleter, "appOwner"),
+          lt(comments.deletedAt, new Date(cursor)),
+        )
       : and(eq(comments.appId, appId), eq(comments.deleter, "appOwner"));
 
     const deletedComments = await db
