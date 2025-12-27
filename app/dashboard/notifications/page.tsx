@@ -1,14 +1,26 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Bell, Check, Info, AlertTriangle, AlertCircle, CheckCircle2, Trash2, Undo2 } from "lucide-react";
+import { Bell, Check, Info, AlertTriangle, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getNotifications, markAsRead, markAllAsRead, deleteNotification, markAsUnread, type Notification } from "@/server/actions/notification";
+import { getNotifications, markAsRead, markAllAsRead } from "@/server/actions/notification";
 import { cn } from "@/lib/utils";
+
+// Notification type based on the database schema
+type Notification = {
+    id: string;
+    userId: string;
+    title: string;
+    message: string;
+    read: boolean;
+    type: "info" | "success" | "warning" | "error";
+    link: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+};
 
 const typeIcons = {
     info: Info,
@@ -50,43 +62,15 @@ export default function NotificationsPage() {
     const unreadCount = unreadNotifications.length;
 
     const handleMarkAsRead = async (id: string) => {
-        try {
-            await markAsRead(id);
-            setNotifications((prev) =>
-                prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-            );
-        } catch (error) {
-            console.error("Error marking notification as read:", error);
-        }
+        await markAsRead(id);
+        setNotifications((prev) =>
+            prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+        );
     };
 
     const handleMarkAllAsRead = async () => {
-        try {
-            await markAllAsRead();
-            setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-        } catch (error) {
-            console.error("Error marking all notifications as read:", error);
-        }
-    };
-
-    const handleDelete = async (id: string) => {
-        try {
-            await deleteNotification(id);
-            setNotifications((prev) => prev.filter((n) => n.id !== id));
-        } catch (error) {
-            console.error("Error deleting notification:", error);
-        }
-    };
-
-    const handleMarkAsUnread = async (id: string) => {
-        try {
-            await markAsUnread(id);
-            setNotifications((prev) =>
-                prev.map((n) => (n.id === id ? { ...n, read: false } : n))
-            );
-        } catch (error) {
-            console.error("Error marking notification as unread:", error);
-        }
+        await markAllAsRead();
+        setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     };
 
     const formatTimestamp = (date: Date) => {
@@ -103,24 +87,13 @@ export default function NotificationsPage() {
 
     const NotificationItem = ({ notification }: { notification: Notification }) => {
         const Icon = typeIcons[notification.type];
-        const router = useRouter();
-
-        const handleNotificationClick = async () => {
-            if (!notification.read) {
-                await handleMarkAsRead(notification.id);
-            }
-            if (notification.link) {
-                router.push(notification.link);
-            }
-        };
-
         return (
             <div
                 className={cn(
                     "flex items-start gap-4 p-4 border-b last:border-b-0 transition-colors hover:bg-muted/50 cursor-pointer",
                     !notification.read && "bg-muted/30"
                 )}
-                onClick={handleNotificationClick}
+                onClick={() => !notification.read && handleMarkAsRead(notification.id)}
             >
                 <div className={cn("p-2 rounded-lg", typeBgColors[notification.type])}>
                     <Icon className={cn("size-4", typeColors[notification.type])} />
@@ -139,43 +112,19 @@ export default function NotificationsPage() {
                         {formatTimestamp(notification.createdAt)}
                     </p>
                 </div>
-                <div className="flex items-center gap-1 shrink-0">
-                    {!notification.read && (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleMarkAsRead(notification.id);
-                            }}
-                        >
-                            <Check className="size-4" />
-                        </Button>
-                    )}
-                    {notification.read && (
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleMarkAsUnread(notification.id);
-                            }}
-                        >
-                            <Undo2 className="size-4" />
-                        </Button>
-                    )}
+                {!notification.read && (
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        className="shrink-0"
                         onClick={(e) => {
                             e.stopPropagation();
-                            handleDelete(notification.id);
+                            handleMarkAsRead(notification.id);
                         }}
                     >
-                        <Trash2 className="size-4" />
+                        <Check className="size-4" />
                     </Button>
-                </div>
+                )}
             </div>
         );
     };
