@@ -163,7 +163,7 @@ export default function NotificationsPage() {
                                     Unread ({unreadCount})
                                 </TabsTrigger>
                                 <TabsTrigger value="all" className="cursor-pointer">
-                                    Read ({readNotifications.length})
+                                    All ({notifications.length})
                                 </TabsTrigger>
                             </TabsList>
                             <TabsContent value="unread" className="mt-4">
@@ -181,11 +181,11 @@ export default function NotificationsPage() {
                                 )}
                             </TabsContent>
                             <TabsContent value="all" className="mt-4">
-                                {readNotifications.length === 0 ? (
-                                    <EmptyState message="No read notifications" />
+                                {notifications.length === 0 ? (
+                                    <EmptyState message="No notifications yet" />
                                 ) : (
                                     <div className="border rounded-lg divide-y">
-                                        {readNotifications.map((notification) => (
+                                        {notifications.map((notification) => (
                                             <NotificationItem
                                                 key={notification.id}
                                                 notification={notification}

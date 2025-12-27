@@ -41,12 +41,14 @@ export function Notifications() {
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const [isOpen, setIsOpen] = useState(false);
 
-    // Fetch notifications on page load
+    // Fetch notifications when popover opens
     useEffect(() => {
-        getNotifications().then((data) => {
-            setNotifications(data as Notification[]);
-        });
-    }, []);
+        if (isOpen) {
+            getNotifications().then((data) => {
+                setNotifications(data as Notification[]);
+            });
+        }
+    }, [isOpen]);
 
     // Filter to only unread notifications
     const unreadNotifications = notifications.filter((n) => !n.read);
