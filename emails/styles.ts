@@ -1,82 +1,75 @@
-/**
- * Shared email template styles for Compyle emails.
- * These styles are used across all email templates for consistent branding.
- * @module emails/styles
- */
-
-/** Main body styles with light gray background */
+/* Main Body */
 export const main = {
-  backgroundColor: "#f6f9fc",
+  backgroundColor: "#f4f4f5" /* --muted */,
   fontFamily:
     '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif',
 };
 
-/** Container styles for the email card with white background and shadow */
+/* Email Container */
 export const container = {
-  backgroundColor: "#ffffff",
+  backgroundColor: "#ffffff" /* --background */,
   margin: "0 auto",
   padding: "0",
   maxWidth: "600px",
   borderRadius: "8px",
-  boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
 };
 
-/** Header section with gradient background (indigo to purple) */
+/* Header Section */
 export const header = {
-  background: "linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%)",
+  backgroundColor: "#1447e6" /* --primary */,
   padding: "32px 40px",
   borderRadius: "8px 8px 0 0",
 };
 
-/** Logo image styles - centered */
+/* Logo Image */
 export const logoImage = {
   margin: "0 auto",
   display: "block",
 };
 
-/** Tagline text below the logo */
+/* Tagline text below the logo */
 export const tagline = {
-  color: "rgba(255, 255, 255, 0.9)",
-  fontSize: "14px",
+  color: "#ffffff" /* --background */,
+  fontSize: "20px",
   fontWeight: "500",
   margin: "12px 0 0",
   textAlign: "center" as const,
   letterSpacing: "0.5px",
 };
 
-/** Main content section padding */
+/* Main Content */
 export const content = {
   padding: "40px",
 };
 
-/** Heading styles for email titles */
+/* Email Title */
 export const heading = {
-  color: "#1a1a1a",
-  fontSize: "24px",
+  color: "#1447e6" /* --primary */,
+  fontSize: "26px",
   fontWeight: "600",
   margin: "0 0 24px",
   textAlign: "center" as const,
 };
 
-/** Paragraph text styles */
+/* Paragraph Text */
 export const paragraph = {
-  color: "#4a5568",
+  color: "#71717b" /* --muted-foreground */,
   fontSize: "16px",
   lineHeight: "26px",
   margin: "0 0 16px",
 };
 
-/** Container for CTA buttons - centered */
+/* Container for CTA Button */
 export const buttonContainer = {
   textAlign: "center" as const,
   margin: "32px 0",
 };
 
-/** Primary CTA button styles with brand color */
+/* CTA Button */
 export const button = {
-  backgroundColor: "#4F46E5",
+  backgroundColor: "#1447e6" /* --primary */,
   borderRadius: "6px",
-  color: "#ffffff",
+  color: "#ffffff" /* --background */,
   fontSize: "16px",
   fontWeight: "600",
   textDecoration: "none",
@@ -85,72 +78,52 @@ export const button = {
   display: "inline-block",
 };
 
-/** Inline link styles */
-export const link = {
-  color: "#4F46E5",
-  fontSize: "14px",
-  wordBreak: "break-all" as const,
-};
-
-/** Horizontal rule divider */
+/* Horizontal Rule */
 export const hr = {
-  borderColor: "#e5e7eb",
+  borderColor: "#e4e4e7" /* --border */,
   margin: "0",
 };
 
-/** Footer section padding */
+/* Footer Section */
 export const footer = {
   padding: "24px 40px",
 };
 
-/** Footer text styles - muted color */
+/* Footer Text */
 export const footerText = {
-  color: "#9ca3af",
-  fontSize: "13px",
+  color: "#71717b" /* --muted-foreground */,
+  fontSize: "14px",
   lineHeight: "22px",
   margin: "0 0 8px",
   textAlign: "center" as const,
 };
 
-/** Footer navigation links container */
-export const footerLinks = {
-  color: "#9ca3af",
-  fontSize: "13px",
-  margin: "16px 0 0",
-  textAlign: "center" as const,
-};
-
-/** Individual footer link styles */
-export const footerLink = {
-  color: "#4F46E5",
-  textDecoration: "none",
-};
-
-/** Social media links section */
+/* Social Media Links Section */
 export const socialSection = {
   textAlign: "center" as const,
   margin: "16px 0",
 };
 
-/** Individual social media link styles */
+/* Individual Social Media Link */
 export const socialLink = {
-  color: "#4F46E5",
-  fontSize: "13px",
+  color: "#1447e6" /* --primary */,
+  fontSize: "14px",
   fontWeight: "600",
   textDecoration: "none",
   margin: "0 12px",
 };
 
-/** Legal links section (Terms, Privacy) */
+/* Legal Links Section */
 export const legalLinks = {
-  color: "#9ca3af",
-  fontSize: "11px",
+  color: "#71717b" /* --muted-foreground */,
+  fontSize: "14px",
   margin: "12px 0 0",
   textAlign: "center" as const,
 };
 
-/** Individual legal link styles */
+/* Individual Legal Links */
 export const legalLink = {
-  color: "#9ca3af",
+  color: "#1447e6" /* --primary */,
   textDecoration: "none",
+  padding: "10px",
 };
