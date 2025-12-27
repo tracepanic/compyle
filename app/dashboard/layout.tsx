@@ -8,6 +8,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import type { Metadata } from "next";
+import { Notifications } from "@/components/dashboard/notifications";
 
 export const metadata: Metadata = {
   title: "Dashboard",
@@ -30,7 +31,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               className="mr-2 data-[orientation=vertical]:h-4"
             />
             <Breadcrumbs />
+            <Notifications />
           </div>
+
         </header>
         <div className="gap-4 p-4 flex-1 overflow-auto container mx-auto">
           <LayoutClient>{children}</LayoutClient>
