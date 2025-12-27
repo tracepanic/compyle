@@ -137,14 +137,24 @@ const ActionsCell = ({
   };
 
   return (
-    <div onClick={(e) => e.stopPropagation()}>
+    <div>
       <DropdownMenu>
-        <DropdownMenuTrigger className="cursor-pointer">
+        <DropdownMenuTrigger
+          className="cursor-pointer"
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
           <Ellipsis className="text-muted-foreground" />
         </DropdownMenuTrigger>
 
         <DropdownMenuContent>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
             <Link className="flex gap-2" href={`/dashboard/apps/${app.id}`}>
               <Eye />
               View Details
@@ -153,13 +163,21 @@ const ActionsCell = ({
 
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => setStatusOpen(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setStatusOpen(true);
+            }}
           >
             <RefreshCw />
             Update Status
           </DropdownMenuItem>
 
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+            }}
+          >
             <Link
               className="flex gap-2"
               href={`/dashboard/apps/edit/${app.id}`}
@@ -173,7 +191,10 @@ const ActionsCell = ({
 
           <DropdownMenuItem
             className="text-destructive cursor-pointer"
-            onClick={() => setDeleteOpen(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setDeleteOpen(true);
+            }}
           >
             <Trash2 className="mr-2 text-destructive" />
             Delete App

@@ -206,7 +206,267 @@ export default function AppDetailsDashboard({ id }: { id: string }) {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-6 gap-9 mt-10">
+          {/* Mobile-First Layout */}
+          <div className="space-y-6 lg:hidden mt-5">
+            {/* Cover Image */}
+            <div className="relative aspect-video rounded-lg overflow-hidden border">
+              {data.appDetails.image ? (
+                <Image
+                  src={data.appDetails.image}
+                  alt={`${data.appDetails.name} cover image`}
+                  fill
+                  priority
+                  className="object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 70vw"
+                />
+              ) : (
+                <div className="w-full h-full bg-linear-to-br from-primary/30 via-secondary/20 to-accent/30" />
+              )}
+            </div>
+
+            {/* Quick Actions - Prominent on Mobile */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <Link
+                  className={`${buttonVariants({ variant: "outline", size: "default" })} w-full`}
+                  href={`/apps/${data.appDetails.slug}`}
+                >
+                  <Eye />
+                  View Public Page
+                </Link>
+                <Link
+                  className={`${buttonVariants({ variant: "outline", size: "default" })} w-full`}
+                  href={`/dashboard/apps/edit/${data.appDetails.id}`}
+                >
+                  <Edit />
+                  Edit App Details
+                </Link>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button
+                      variant="destructive"
+                      className="w-full gap-2 cursor-pointer"
+                      size="default"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete App
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>
+                        Delete {data.appDetails.name}?
+                      </AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently delete this app and all associated
+                        data including comments and likes. This action cannot be
+                        undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel className="cursor-pointer">
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        className="bg-destructive cursor-pointer text-foreground hover:bg-destructive/90"
+                        onClick={handleDelete}
+                      >
+                        Delete Permanently
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </CardContent>
+            </Card>
+
+            {/* Description */}
+            <div>
+              <p className="font-semibold text-sm mb-2">DESCRIPTION</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {data.appDetails.description}
+              </p>
+            </div>
+
+            {/* App Links */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">App Links</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {data.appDetails.websiteUrl ? (
+                  <Link
+                    href={data.appDetails.websiteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 rounded-lg border border-border/50 bg-secondary/30 hover:bg-secondary/50 transition-colors group"
+                  >
+                    <div className="h-9 w-9 rounded-lg bg-background/50 flex items-center justify-center shrink-0">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Website
+                      </p>
+                      <p className="text-xs text-foreground truncate group-hover:text-primary transition-colors">
+                        {data.appDetails.websiteUrl.replace(/^https?:\/\//, "")}
+                      </p>
+                    </div>
+
+                    <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-3 p-3 rounded-lg border border-border/50 bg-secondary/20 cursor-not-allowed">
+                    <div className="h-9 w-9 rounded-lg bg-background/50 flex items-center justify-center shrink-0">
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Website
+                      </p>
+                      <p className="text-xs text-muted-foreground italic">
+                        Not provided
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {data.appDetails.repoUrl ? (
+                  <Link
+                    href={data.appDetails.repoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 rounded-lg border border-border/50 bg-secondary/30 hover:bg-secondary/50 transition-colors group"
+                  >
+                    <div className="h-9 w-9 rounded-lg bg-background/50 flex items-center justify-center shrink-0">
+                      <Github className="h-4 w-4 text-muted-foreground" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Repository
+                      </p>
+                      <p className="text-xs text-foreground truncate group-hover:text-primary transition-colors">
+                        {data.appDetails.repoUrl.replace(/^https?:\/\//, "")}
+                      </p>
+                    </div>
+
+                    <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-3 p-3 rounded-lg border border-border/50 bg-secondary/20 cursor-not-allowed">
+                    <div className="h-9 w-9 rounded-lg bg-background/50 flex items-center justify-center shrink-0">
+                      <Github className="h-4 w-4 text-muted-foreground" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Repository
+                      </p>
+                      <p className="text-xs text-muted-foreground italic">
+                        Not provided
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {data.appDetails.demoUrl ? (
+                  <Link
+                    href={data.appDetails.demoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 p-3 rounded-lg border border-border/50 bg-secondary/30 hover:bg-secondary/50 transition-colors group"
+                  >
+                    <div className="h-9 w-9 rounded-lg bg-background/50 flex items-center justify-center shrink-0">
+                      <MonitorPlay className="h-4 w-4 text-muted-foreground" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Live Demo
+                      </p>
+                      <p className="text-xs text-foreground truncate group-hover:text-primary transition-colors">
+                        {data.appDetails.demoUrl.replace(/^https?:\/\//, "")}
+                      </p>
+                    </div>
+
+                    <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-3 p-3 rounded-lg border border-border/50 bg-secondary/20 cursor-not-allowed">
+                    <div className="h-9 w-9 rounded-lg bg-background/50 flex items-center justify-center shrink-0">
+                      <MonitorPlay className="h-4 w-4 text-muted-foreground" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs font-medium text-muted-foreground">
+                        Live Demo
+                      </p>
+                      <p className="text-xs text-muted-foreground italic">
+                        Not provided
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Tags */}
+            <div>
+              <p className="font-semibold text-sm mb-3">TAGS</p>
+              <div className="flex flex-wrap gap-2">
+                {data.appDetails.builtWith.map((tech) => (
+                  <Badge key={tech} variant="secondary" className="rounded-xs">
+                    {tech}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+
+            {/* App Metadata */}
+            <Card>
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base">App Metadata</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">CATEGORY</p>
+                  <Badge className="rounded-xs">
+                    {data.appDetails.category}
+                  </Badge>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    CREATED AT
+                  </p>
+                  <p className="text-sm">
+                    {format(new Date(data.appDetails.createdAt), "MMM d, yyyy")}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-xs text-muted-foreground mb-1">
+                    LAST UPDATED
+                  </p>
+                  <p className="text-sm">
+                    {format(new Date(data.appDetails.updatedAt), "MMM d, yyyy")}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Comments */}
+            {data.appDetails && (
+              <div className="pt-4">
+                <AppComments appId={id} />
+              </div>
+            )}
+          </div>
+
+          <div className="hidden lg:grid grid-cols-1 lg:grid-cols-6 gap-9">
             <div className="lg:col-span-4 space-y-6">
               <div className="relative aspect-video rounded-lg overflow-hidden border">
                 {data.appDetails.image ? (

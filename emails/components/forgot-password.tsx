@@ -55,8 +55,8 @@ interface PasswordResetEmailTemplateProps {
  * @returns React Email component for password reset
  */
 export default function PasswordResetEmailTemplate({
-  name,
-  url,
+  name = "Trace Panic",
+  url = "http://localhost:3000/url",
 }: PasswordResetEmailTemplateProps) {
   return (
     <Html lang="en">

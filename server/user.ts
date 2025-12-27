@@ -64,3 +64,40 @@ export async function getPublicUserProfile({
     throw new Error("Failed to fetch user profile");
   }
 }
+
+export async function getPublicUserSEO({
+  username,
+}: {
+  username: string;
+}): Promise<{
+  name: string;
+  about: string;
+  image: string | null;
+}> {
+  try {
+    if (!username) {
+      throw new Error("Invalid username");
+    }
+
+    const res = await db
+      .select({
+        name: users.name,
+        about: users.about,
+        image: users.image,
+      })
+      .from(users)
+      .where(eq(users.username, username));
+
+    if (res.length < 1) {
+      throw new Error("No user found with the provided username");
+    }
+
+    return res[0];
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Failed to fetch user profile");
+  }
+}

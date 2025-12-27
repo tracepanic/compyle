@@ -2,9 +2,10 @@
 
 import { db } from "@/db";
 import { apps } from "@/db/schemas/app";
+import { comments } from "@/db/schemas/comment";
 import { upvotes } from "@/db/schemas/upvote";
 import { getUserFromAuth } from "@/server/user";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 export async function getDashboardStats(): Promise<{
   totalApps: number;
@@ -15,54 +16,137 @@ export async function getDashboardStats(): Promise<{
   viewsGrowth: number;
   totalFollowers: number;
   followersGrowth: number;
+  totalComments: number;
+  commentsGrowth: number;
   upvotesOverTime: Array<{ month: string; upvotes: number }>;
+  commentsOverTime: Array<{ month: string; comments: number }>;
 }> {
   try {
     const user = await getUserFromAuth();
 
-    const [appsResult, upvotesResult, upvotesOverTimeResult] =
-      await Promise.all([
-        db
-          .select({
-            count: sql<number>`count(*)`,
-          })
-          .from(apps)
-          .where(eq(apps.userId, user.id)),
+    const now = new Date();
+    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+    const sixtyDaysAgo = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
 
-        // Get total upvotes across all user's apps
-        db
-          .select({
-            count: sql<number>`count(*)`,
-          })
-          .from(upvotes)
-          .innerJoin(apps, eq(apps.id, upvotes.appId))
-          .where(eq(apps.userId, user.id)),
+    const [
+      appsStats,
+      upvotesStats,
+      commentsStats,
+      upvotesOverTimeResult,
+      commentsOverTimeResult,
+    ] = await Promise.all([
+      db
+        .select({
+          total: sql<number>`count(*)::int`,
+          lastMonth: sql<number>`count(*) FILTER (WHERE ${apps.createdAt} >= ${thirtyDaysAgo})::int`,
+          previousMonth: sql<number>`count(*) FILTER (WHERE ${apps.createdAt} >= ${sixtyDaysAgo} AND ${apps.createdAt} < ${thirtyDaysAgo})::int`,
+        })
+        .from(apps)
+        .where(eq(apps.userId, user.id))
+        .$withCache({
+          config: { ex: 300 },
+          tag: `dashboard:${user.id}:apps:stats`,
+        }),
 
-        // Get upvotes over time (last 6 months)
-        db
-          .select({
-            year: sql<number>`EXTRACT(YEAR FROM ${upvotes.createdAt})::int`,
-            month: sql<number>`EXTRACT(MONTH FROM ${upvotes.createdAt})::int`,
-            upvotes: sql<number>`count(*)::int`,
-          })
-          .from(upvotes)
-          .innerJoin(apps, eq(apps.id, upvotes.appId))
-          .where(
-            and(
-              eq(apps.userId, user.id),
-              sql`${upvotes.createdAt} >= NOW() - INTERVAL '6 months'`,
-            ),
-          )
-          .groupBy(
-            sql`EXTRACT(YEAR FROM ${upvotes.createdAt})`,
-            sql`EXTRACT(MONTH FROM ${upvotes.createdAt})`,
+      db
+        .select({
+          total: sql<number>`count(*)::int`,
+          lastMonth: sql<number>`count(*) FILTER (WHERE ${upvotes.createdAt} >= ${thirtyDaysAgo})::int`,
+          previousMonth: sql<number>`count(*) FILTER (WHERE ${upvotes.createdAt} >= ${sixtyDaysAgo} AND ${upvotes.createdAt} < ${thirtyDaysAgo})::int`,
+        })
+        .from(upvotes)
+        .innerJoin(apps, eq(apps.id, upvotes.appId))
+        .where(eq(apps.userId, user.id))
+        .$withCache({
+          config: { ex: 300 },
+          tag: `dashboard:${user.id}:upvotes:stats`,
+        }),
+
+      db
+        .select({
+          total: sql<number>`count(*)::int`,
+          lastMonth: sql<number>`count(*) FILTER (WHERE ${comments.createdAt} >= ${thirtyDaysAgo})::int`,
+          previousMonth: sql<number>`count(*) FILTER (WHERE ${comments.createdAt} >= ${sixtyDaysAgo} AND ${comments.createdAt} < ${thirtyDaysAgo})::int`,
+        })
+        .from(comments)
+        .innerJoin(apps, eq(apps.id, comments.appId))
+        .where(and(eq(apps.userId, user.id), isNull(comments.deletedAt)))
+        .$withCache({
+          config: { ex: 300 },
+          tag: `dashboard:${user.id}:comments:stats`,
+        }),
+
+      db
+        .select({
+          year: sql<number>`EXTRACT(YEAR FROM ${upvotes.createdAt})::int`,
+          month: sql<number>`EXTRACT(MONTH FROM ${upvotes.createdAt})::int`,
+          upvotes: sql<number>`count(*)::int`,
+        })
+        .from(upvotes)
+        .innerJoin(apps, eq(apps.id, upvotes.appId))
+        .where(
+          and(
+            eq(apps.userId, user.id),
+            sql`${upvotes.createdAt} >= NOW() - INTERVAL '6 months'`,
           ),
-      ]);
+        )
+        .groupBy(
+          sql`EXTRACT(YEAR FROM ${upvotes.createdAt})`,
+          sql`EXTRACT(MONTH FROM ${upvotes.createdAt})`,
+        )
+        .$withCache({
+          config: { ex: 600 },
+          tag: `dashboard:${user.id}:upvotes:timeline`,
+        }),
 
-    const totalApps = appsResult[0]?.count || 0;
-    const totalUpvotes = upvotesResult[0]?.count || 0;
+      db
+        .select({
+          year: sql<number>`EXTRACT(YEAR FROM ${comments.createdAt})::int`,
+          month: sql<number>`EXTRACT(MONTH FROM ${comments.createdAt})::int`,
+          comments: sql<number>`count(*)::int`,
+        })
+        .from(comments)
+        .innerJoin(apps, eq(apps.id, comments.appId))
+        .where(
+          and(
+            eq(apps.userId, user.id),
+            isNull(comments.deletedAt),
+            sql`${comments.createdAt} >= NOW() - INTERVAL '6 months'`,
+          ),
+        )
+        .groupBy(
+          sql`EXTRACT(YEAR FROM ${comments.createdAt})`,
+          sql`EXTRACT(MONTH FROM ${comments.createdAt})`,
+        )
+        .$withCache({
+          config: { ex: 600 },
+          tag: `dashboard:${user.id}:comments:timeline`,
+        }),
+    ]);
 
-    // Create a map of year-month to upvotes
+    const calculateGrowth = (current: number, previous: number): number => {
+      if (previous === 0) return current > 0 ? 100 : 0;
+      return Math.round(((current - previous) / previous) * 100);
+    };
+
+    const totalApps = appsStats[0]?.total || 0;
+    const appsGrowth = calculateGrowth(
+      appsStats[0]?.lastMonth || 0,
+      appsStats[0]?.previousMonth || 0,
+    );
+
+    const totalUpvotes = upvotesStats[0]?.total || 0;
+    const upvotesGrowth = calculateGrowth(
+      upvotesStats[0]?.lastMonth || 0,
+      upvotesStats[0]?.previousMonth || 0,
+    );
+
+    const totalComments = commentsStats[0]?.total || 0;
+    const commentsGrowth = calculateGrowth(
+      commentsStats[0]?.lastMonth || 0,
+      commentsStats[0]?.previousMonth || 0,
+    );
+
     const upvotesMap = new Map(
       upvotesOverTimeResult.map((item) => [
         `${item.year}-${item.month}`,
@@ -70,52 +154,55 @@ export async function getDashboardStats(): Promise<{
       ]),
     );
 
-    // Generate last 6 months
-    const now = new Date();
+    const commentsMap = new Map(
+      commentsOverTimeResult.map((item) => [
+        `${item.year}-${item.month}`,
+        item.comments,
+      ]),
+    );
+
     const upvotesOverTime = Array.from({ length: 6 }, (_, i) => {
       const date = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
       const monthName = date.toLocaleString("default", { month: "long" });
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       const key = `${year}-${month}`;
-
       return {
         month: monthName,
         upvotes: upvotesMap.get(key) || 0,
       };
     });
 
-    // TODO: Implement views tracking
-    const totalViews = 0;
-
-    // TODO: Implement followers functionality
-    // This would require a followers/follows table
-    const totalFollowers = 0;
-
-    // TODO: Calculate actual growth percentages
-    // This would require storing historical data or timestamps
-    // For now, returning 0 as placeholders
-    const appsGrowth = 0;
-    const upvotesGrowth = 0;
-    const viewsGrowth = 0;
-    const followersGrowth = 0;
+    const commentsOverTime = Array.from({ length: 6 }, (_, i) => {
+      const date = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+      const monthName = date.toLocaleString("default", { month: "long" });
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const key = `${year}-${month}`;
+      return {
+        month: monthName,
+        comments: commentsMap.get(key) || 0,
+      };
+    });
 
     return {
       totalApps,
       appsGrowth,
       totalUpvotes,
       upvotesGrowth,
-      totalViews,
-      viewsGrowth,
-      totalFollowers,
-      followersGrowth,
+      totalViews: 0,
+      viewsGrowth: 0,
+      totalFollowers: 0,
+      followersGrowth: 0,
+      totalComments,
+      commentsGrowth,
       upvotesOverTime,
+      commentsOverTime,
     };
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
     }
-
     throw new Error("Failed to fetch dashboard stats");
   }
 }

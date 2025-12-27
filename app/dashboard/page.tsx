@@ -10,27 +10,50 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Spinner } from "@/components/ui/spinner";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getDashboardStats } from "@/server/dashboard";
 import { useAuthStore } from "@/store/session.store";
 import { useQuery } from "@tanstack/react-query";
 import {
   AlertCircleIcon,
-  Eye,
   Heart,
+  MessageSquare,
   Plus,
   Rocket,
+  TrendingDown,
   TrendingUp,
   Users,
 } from "lucide-react";
 import Link from "next/link";
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 
-const chartConfig = {
+const upvoteChartConfig = {
   upvotes: {
     label: "Upvotes",
-    color: "hsl(var(--chart-1))", // Doesnt work, I have set the color directly in the bar
+    color: "hsl(var(--chart-1))",
   },
 } satisfies ChartConfig;
+
+const commentChartConfig = {
+  comments: {
+    label: "Comments",
+    color: "hsl(var(--chart-1))",
+  },
+} satisfies ChartConfig;
+
+function GrowthIndicator({ growth }: { growth: number }) {
+  const isPositive = growth >= 0;
+  const Icon = isPositive ? TrendingUp : TrendingDown;
+  const colorClass = isPositive ? "text-green-500" : "text-destructive";
+
+  return (
+    <p className={`text-xs flex items-center gap-1 ${colorClass}`}>
+      <Icon className="size-3" />
+      {isPositive ? "+" : ""}
+      {growth}% from last month
+    </p>
+  );
+}
 
 export default function Page() {
   const { authInfo } = useAuthStore();
@@ -43,7 +66,8 @@ export default function Page() {
     gcTime: 10 * 60 * 1000,
   });
 
-  const chartData = data?.upvotesOverTime || [];
+  const upvoteData = data?.upvotesOverTime || [];
+  const commentData = data?.commentsOverTime || [];
 
   return (
     <div className="space-y-6">
@@ -80,9 +104,7 @@ export default function Page() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{data.totalApps}</div>
-                <p className="text-muted-foreground text-xs">
-                  +{data.appsGrowth}% from last month
-                </p>
+                <GrowthIndicator growth={data.appsGrowth} />
               </CardContent>
             </Card>
             <Card>
@@ -94,23 +116,19 @@ export default function Page() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{data.totalUpvotes}</div>
-                <p className="text-muted-foreground text-xs">
-                  +{data.upvotesGrowth}% from last month
-                </p>
+                <GrowthIndicator growth={data.upvotesGrowth} />
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
-                  Total Views
+                  Total Comments
                 </CardTitle>
-                <Eye className="text-foreground/50 size-5" />
+                <MessageSquare className="text-foreground/50 size-5" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{data.totalViews}</div>
-                <p className="text-muted-foreground text-xs">
-                  +{data.viewsGrowth}% from last month
-                </p>
+                <div className="text-2xl font-bold">{data.totalComments}</div>
+                <GrowthIndicator growth={data.commentsGrowth} />
               </CardContent>
             </Card>
             <Card>
@@ -120,49 +138,94 @@ export default function Page() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{data.totalFollowers}</div>
-                <p className="text-muted-foreground text-xs">
-                  +{data.followersGrowth}% from last month
-                </p>
+                <GrowthIndicator growth={data.followersGrowth} />
               </CardContent>
             </Card>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-3">
             <Card className="lg:col-span-2 min-w-0">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <TrendingUp className="h-4 w-4 text-primary" />
-                  Upvotes Over Time
-                </CardTitle>
+              <CardHeader>
+                <CardTitle className="text-lg">Performance Overview</CardTitle>
               </CardHeader>
-              <CardContent className="pb-4 overflow-x-auto">
-                <ChartContainer
-                  config={chartConfig}
-                  className="h-52 w-full min-w-72"
-                >
-                  <BarChart accessibilityLayer data={chartData}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis
-                      dataKey="month"
-                      tickLine={false}
-                      axisLine={false}
-                      tickMargin={8}
-                      tickFormatter={(value) => value.slice(0, 3)}
-                      fontSize={12}
-                    />
-                    <YAxis
-                      tickLine={false}
-                      axisLine={false}
-                      tickMargin={8}
-                      fontSize={12}
-                    />
-                    <ChartTooltip
-                      cursor={false}
-                      content={<ChartTooltipContent hideLabel />}
-                    />
-                    <Bar dataKey="upvotes" fill="var(--chart-4)" radius={4} />
-                  </BarChart>
-                </ChartContainer>
+              <CardContent className="overflow-x-auto">
+                <Tabs defaultValue="upvotes">
+                  <TabsList>
+                    <TabsTrigger value="upvotes" className="cursor-pointer">
+                      Upvotes
+                    </TabsTrigger>
+                    <TabsTrigger value="comments" className="cursor-pointer">
+                      Comments
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="upvotes" className="mt-10">
+                    <ChartContainer
+                      config={upvoteChartConfig}
+                      className="h-52 w-full min-w-72"
+                    >
+                      <BarChart accessibilityLayer data={upvoteData}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                          dataKey="month"
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          tickFormatter={(value) => value.slice(0, 3)}
+                          fontSize={12}
+                        />
+                        <YAxis
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          fontSize={12}
+                        />
+                        <ChartTooltip
+                          cursor={false}
+                          content={<ChartTooltipContent hideLabel />}
+                        />
+                        <Bar
+                          dataKey="upvotes"
+                          fill="var(--chart-4)"
+                          radius={4}
+                        />
+                      </BarChart>
+                    </ChartContainer>
+                  </TabsContent>
+
+                  <TabsContent value="comments" className="mt-10">
+                    <ChartContainer
+                      config={commentChartConfig}
+                      className="h-52 w-full min-w-72"
+                    >
+                      <BarChart accessibilityLayer data={commentData}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis
+                          dataKey="month"
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          tickFormatter={(value) => value.slice(0, 3)}
+                          fontSize={12}
+                        />
+                        <YAxis
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          fontSize={12}
+                        />
+                        <ChartTooltip
+                          cursor={false}
+                          content={<ChartTooltipContent hideLabel />}
+                        />
+                        <Bar
+                          dataKey="comments"
+                          fill="var(--chart-4)"
+                          radius={4}
+                        />
+                      </BarChart>
+                    </ChartContainer>
+                  </TabsContent>
+                </Tabs>
               </CardContent>
             </Card>
 

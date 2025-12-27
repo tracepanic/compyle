@@ -4,6 +4,11 @@ export const DASHBOARD_BREADCRUMBS: Record<
 > = {
   "/dashboard": [{ label: "Dashboard", href: "/dashboard" }],
 
+  "/dashboard/comments": [
+    { label: "Dashboard", href: "/dashboard" },
+    { label: "Comments", href: "/dashboard/comments" },
+  ],
+
   "/dashboard/apps": [
     { label: "Dashboard", href: "/dashboard" },
     { label: "Apps", href: "/dashboard/apps" },

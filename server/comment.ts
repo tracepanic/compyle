@@ -4,9 +4,10 @@ import { db } from "@/db";
 import { apps } from "@/db/schemas/app";
 import { comments } from "@/db/schemas/comment";
 import { users } from "@/db/schemas/user";
+import { env } from "@/env/server";
 import { createCommentSchema } from "@/schema/comment.schema";
 import { getUserFromAuth } from "@/server/user";
-import { and, desc, eq, isNull, lt } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, lt } from "drizzle-orm";
 import z, { ZodError } from "zod";
 
 export async function addComment(
@@ -321,5 +322,273 @@ export async function getAppCommentsAdmin({
     }
 
     throw new Error("Failed to fetch admin comments");
+  }
+}
+
+export async function getDeletedCommentsByAppOwner({
+  appId,
+  limit = 15,
+  cursor,
+}: {
+  appId: string;
+  limit?: number;
+  cursor?: string;
+}): Promise<{
+  comments: Array<{
+    id: string;
+    content: string;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
+    deleteReason: string;
+    user: {
+      id: string;
+      name: string;
+      image: string | null;
+      username: string;
+    };
+  }>;
+  nextCursor: string | null;
+}> {
+  try {
+    if (!appId) {
+      throw new Error("Invalid app ID");
+    }
+
+    const user = await getUserFromAuth();
+
+    // Verify user owns the app
+    const appExists = await db
+      .select({ id: apps.id })
+      .from(apps)
+      .where(and(eq(apps.id, appId), eq(apps.userId, user.id)))
+      .limit(1);
+
+    if (appExists.length === 0) {
+      throw new Error("Not authorized or app not found");
+    }
+
+    // Build where conditions for deleted comments by app owner
+    const whereConditions = cursor
+      ? and(
+          eq(comments.appId, appId),
+          eq(comments.deleter, "appOwner"),
+          lt(comments.deletedAt, new Date(cursor)),
+        )
+      : and(eq(comments.appId, appId), eq(comments.deleter, "appOwner"));
+
+    const deletedComments = await db
+      .select({
+        id: comments.id,
+        content: comments.content,
+        createdAt: comments.createdAt,
+        updatedAt: comments.updatedAt,
+        deletedAt: comments.deletedAt,
+        deleteReason: comments.deleteReason,
+        user: {
+          id: users.id,
+          name: users.name,
+          image: users.image,
+          username: users.username,
+        },
+      })
+      .from(comments)
+      .innerJoin(users, eq(comments.userId, users.id))
+      .where(whereConditions)
+      .orderBy(desc(comments.deletedAt)) // Order by deletion date
+      .limit(limit + 1);
+
+    const hasMore = deletedComments.length > limit;
+    const commentsToReturn = hasMore
+      ? deletedComments.slice(0, limit)
+      : deletedComments;
+
+    const nextCursor = hasMore
+      ? commentsToReturn[commentsToReturn.length - 1].deletedAt!.toISOString()
+      : null;
+
+    return {
+      comments: commentsToReturn.map((comment) => ({
+        ...comment,
+        deletedAt: comment.deletedAt!,
+        deleteReason: comment.deleteReason!,
+      })),
+      nextCursor,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Failed to fetch deleted comments");
+  }
+}
+
+export async function getUserCommentsDashboard(): Promise<
+  Array<{
+    id: string;
+    content: string;
+    createdAt: Date;
+    updatedAt: Date;
+    app: {
+      id: string;
+      name: string;
+      slug: string;
+      image: string | null;
+    };
+  }>
+> {
+  try {
+    const user = await getUserFromAuth();
+
+    const userComments = await db
+      .select({
+        id: comments.id,
+        content: comments.content,
+        createdAt: comments.createdAt,
+        updatedAt: comments.updatedAt,
+        app: {
+          id: apps.id,
+          name: apps.name,
+          slug: apps.slug,
+          image: apps.image,
+        },
+      })
+      .from(comments)
+      .innerJoin(apps, eq(comments.appId, apps.id))
+      .where(and(eq(comments.userId, user.id), isNull(comments.deletedAt)))
+      .orderBy(desc(comments.createdAt));
+
+    return userComments;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Failed to fetch user comments");
+  }
+}
+
+export async function getUserDeletedCommentsDashboard(): Promise<
+  Array<{
+    id: string;
+    content: string;
+    createdAt: Date;
+    deletedAt: Date;
+    deleter: "author" | "appOwner";
+    deleteReason: string | null;
+    app: {
+      id: string;
+      name: string;
+      slug: string;
+      image: string | null;
+      owner: {
+        id: string;
+        name: string;
+        username: string;
+      };
+    };
+  }>
+> {
+  try {
+    const user = await getUserFromAuth();
+
+    const deletedComments = await db
+      .select({
+        id: comments.id,
+        content: comments.content,
+        createdAt: comments.createdAt,
+        deletedAt: comments.deletedAt,
+        deleter: comments.deleter,
+        deleteReason: comments.deleteReason,
+        app: {
+          id: apps.id,
+          name: apps.name,
+          slug: apps.slug,
+          image: apps.image,
+        },
+        appOwner: {
+          id: users.id,
+          name: users.name,
+          username: users.username,
+        },
+      })
+      .from(comments)
+      .innerJoin(apps, eq(comments.appId, apps.id))
+      .innerJoin(users, eq(apps.userId, users.id))
+      .where(and(eq(comments.userId, user.id), isNotNull(comments.deletedAt)))
+      .orderBy(desc(comments.deletedAt));
+
+    return deletedComments.map((comment) => ({
+      id: comment.id,
+      content: comment.content,
+      createdAt: comment.createdAt,
+      deletedAt: comment.deletedAt!,
+      deleter: comment.deleter as "author" | "appOwner",
+      deleteReason: comment.deleteReason,
+      app: {
+        id: comment.app.id,
+        name: comment.app.name,
+        slug: comment.app.slug,
+        image: comment.app.image,
+        owner: {
+          id: comment.appOwner.id,
+          name: comment.appOwner.name,
+          username: comment.appOwner.username,
+        },
+      },
+    }));
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Failed to fetch deleted comments");
+  }
+}
+
+export async function permanentlyDeleteOldComments(
+  cronSecret: string,
+): Promise<{
+  success: boolean;
+  count: number;
+  message: string;
+}> {
+  try {
+    const validSecret = env.CRON_SECRET;
+
+    if (!validSecret) {
+      throw new Error("CRON_SECRET not configured");
+    }
+
+    if (cronSecret !== validSecret) {
+      throw new Error("Unauthorized: Invalid cron secret");
+    }
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const result = await db
+      .delete(comments)
+      .where(
+        and(
+          isNotNull(comments.deletedAt),
+          isNotNull(comments.deleter),
+          lt(comments.deletedAt, thirtyDaysAgo),
+        ),
+      )
+      .returning({ id: comments.id });
+
+    return {
+      success: true,
+      count: result.length,
+      message: `Successfully deleted ${result.length} comments older than 30 days`,
+    };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Failed to delete old comments");
   }
 }

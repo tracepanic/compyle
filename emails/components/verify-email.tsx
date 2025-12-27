@@ -54,10 +54,10 @@ interface EmailVerificationEmailTemplateProps {
  * @param props.url - The email verification URL
  * @returns React Email component for email verification
  */
-export default function EmailVerificationEmailTemplate({
-  name,
-  url,
-}: EmailVerificationEmailTemplateProps) {
+export default function EmailVerificationEmailTempate({
+  name = "Trace Panic",
+  url = "http://localhost:3000/url",
+}: EmailVerificationEmailTempateProps) {
   return (
     <Html lang="en">
       <Head />

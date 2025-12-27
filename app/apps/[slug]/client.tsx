@@ -138,7 +138,8 @@ export function AppDetailsClient({ slug }: { slug: string }) {
 
       {!appResult.isPending && app && (
         <div className="md:px-16">
-          <div className="w-full h-96 rounded-lg mb-4 overflow-hidden border relative">
+          {/* Hero Image */}
+          <div className="w-full h-48 sm:h-64 md:h-96 rounded-lg mb-4 md:mb-6 overflow-hidden border relative">
             {app.appDetails.image ? (
               <Image
                 src={app.appDetails.image}
@@ -153,7 +154,180 @@ export function AppDetailsClient({ slug }: { slug: string }) {
             )}
           </div>
 
-          <div className="grid gap-9 lg:grid-cols-6 mt-10">
+          {/* Mobile-First Layout */}
+          <div className="space-y-6 lg:hidden">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+                {app.appDetails.name}
+              </h1>
+              <p className="text-sm sm:text-base text-muted-foreground">
+                {app.appDetails.description}
+              </p>
+            </div>
+
+            {/* Tags */}
+            <div className="flex flex-wrap gap-2">
+              <Badge className="rounded-xs">{app.appDetails.category}</Badge>
+              {app.appDetails.builtWith.map((tech) => (
+                <Badge key={tech} variant="secondary" className="rounded-xs">
+                  {tech}
+                </Badge>
+              ))}
+            </div>
+
+            {/* Upvote Card - Prominent on Mobile */}
+            <div className="rounded-lg border border-border bg-card p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-foreground tracking-tighter">
+                    {app.upvoteCount}
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">upvotes</p>
+                </div>
+                {authInfo?.session ? (
+                  <Button
+                    disabled={isUpvoteLoading || upvoteMutation.isPending}
+                    className="flex-1 cursor-pointer"
+                    onClick={handleUpvote}
+                  >
+                    {isUpvoteLoading ? (
+                      <>
+                        <Spinner className="size-4" />
+                        Loading...
+                      </>
+                    ) : upvoteMutation.isPending ? (
+                      "Updating..."
+                    ) : upvoteStatus.hasUpvoted ? (
+                      <>
+                        <Heart className="h-5 w-5 fill-current" />
+                        Upvoted
+                      </>
+                    ) : (
+                      <>
+                        <Heart className="h-5 w-5" />
+                        Upvote
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Link href="/login" className="flex-1">
+                    <Button className="w-full cursor-pointer">
+                      <Heart className="h-5 w-5" />
+                      Login to Upvote
+                    </Button>
+                  </Link>
+                )}
+              </div>
+            </div>
+
+            {/* Action Links */}
+            {hasAnyLinks && (
+              <div className="flex flex-col sm:flex-row gap-2">
+                {app.appDetails.demoUrl && (
+                  <Link
+                    className={buttonVariants({
+                      size: "default",
+                      className: "flex-1",
+                    })}
+                    href={app.appDetails.demoUrl}
+                    target="_blank"
+                  >
+                    <Globe className="h-4 w-4" />
+                    View Demo
+                  </Link>
+                )}
+                {app.appDetails.websiteUrl && (
+                  <Link
+                    className={buttonVariants({
+                      size: "default",
+                      variant: "outline",
+                      className: "flex-1",
+                    })}
+                    href={app.appDetails.websiteUrl}
+                    target="_blank"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Visit Site
+                  </Link>
+                )}
+                {app.appDetails.repoUrl && (
+                  <Link
+                    className={buttonVariants({
+                      size: "default",
+                      variant: "outline",
+                      className: "flex-1",
+                    })}
+                    href={app.appDetails.repoUrl}
+                    target="_blank"
+                  >
+                    <Github className="h-4 w-4" />
+                    Source Code
+                  </Link>
+                )}
+              </div>
+            )}
+
+            {/* Creator Info - Compact on Mobile */}
+            <div className="rounded-lg border border-border bg-card p-4">
+              <div className="flex items-center gap-3">
+                <Avatar className="h-12 w-12 shrink-0">
+                  <AvatarImage src={app.userDetails.image || undefined} />
+                  <AvatarFallback>
+                    {getInitials(app.userDetails.name)}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-muted-foreground mb-1">
+                    Created by
+                  </p>
+                  <h3 className="font-semibold text-foreground truncate">
+                    {app.userDetails.name}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    u/{app.userDetails.username}
+                  </p>
+                </div>
+                <Link href={`/u/${app.userDetails.username}`}>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="cursor-pointer"
+                  >
+                    View
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            {/* App Details */}
+            <div className="rounded-lg border border-border bg-card p-4">
+              <p className="mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                Details
+              </p>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Status</span>
+                  <span className="font-semibold text-foreground capitalize">
+                    {app.appDetails.status}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Posted</span>
+                  <span className="font-semibold text-foreground">
+                    {format(new Date(app.appDetails.createdAt), "MMM d, yyyy")}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <Separator />
+
+            {/* Comments Section */}
+            <AppComments slug={slug} id={app.appDetails.id} />
+          </div>
+
+          {/* Desktop Layout */}
+          <div className="hidden lg:grid gap-9 lg:grid-cols-6 mt-10">
             <div className="lg:col-span-4 space-y-8">
               <div>
                 <div className="mb-4 flex items-start justify-between">
@@ -280,17 +454,7 @@ export function AppDetailsClient({ slug }: { slug: string }) {
                 </p>
                 <div className="flex flex-col items-center text-center">
                   <Avatar className="mb-3 h-16 w-16">
-                    {app.userDetails.image ? (
-                      <AvatarImage asChild>
-                        <Image
-                          src={app.userDetails.image}
-                          alt={app.userDetails.name}
-                          width={64}
-                          height={64}
-                          className="object-cover"
-                        />
-                      </AvatarImage>
-                    ) : null}
+                    <AvatarImage src={app.userDetails.image || undefined} />
                     <AvatarFallback>
                       {getInitials(app.userDetails.name)}
                     </AvatarFallback>

@@ -16,6 +16,7 @@ import {
   ArrowUpRight,
   CornerUpLeft,
   House,
+  MessageCircleMore,
   Settings,
   SquareTerminal,
 } from "lucide-react";
@@ -25,6 +26,7 @@ import Link from "next/link";
 const data = {
   navMain: [
     { title: "Dashboard", url: "/dashboard", icon: House },
+    { title: "Comments", url: "/dashboard/comments", icon: MessageCircleMore },
     {
       title: "Apps",
       url: "/dashboard/apps",

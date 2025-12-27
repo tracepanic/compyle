@@ -18,13 +18,13 @@ export async function generateMetadata({
       openGraph: {
         title: `${data.name} | Compyle Apps`,
         description: data.description,
-        images: [{ url: data.image || "" }],
+        ...(data.image && { images: [{ url: data.image }] }),
       },
       twitter: {
         card: "summary_large_image",
         title: `${data.name} | Compyle Apps`,
         description: data.description,
-        images: [{ url: data.image || "" }],
+        ...(data.image && { images: [{ url: data.image }] }),
       },
     };
   } catch {
