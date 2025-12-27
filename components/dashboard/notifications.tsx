@@ -4,8 +4,21 @@ import { useRouter } from "next/navigation";
 import { Bell, Check, Info, AlertTriangle, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { getNotifications, markAsRead, markAllAsRead, type Notification } from "@/server/actions/notification";
+import { getNotifications, markAsRead, markAllAsRead } from "@/server/actions/notification";
 import { cn } from "@/lib/utils";
+
+// Notification type based on the database schema
+type Notification = {
+    id: string;
+    userId: string;
+    title: string;
+    message: string;
+    read: boolean;
+    type: "info" | "success" | "warning" | "error";
+    link: string | null;
+    createdAt: Date;
+    updatedAt: Date;
+};
 
 const MAX_VISIBLE_NOTIFICATIONS = 3;
 
@@ -30,15 +43,10 @@ export function Notifications() {
 
     // Fetch notifications on page load
     useEffect(() => {
-        getNotifications()
-            .then((data) => {
-                setNotifications(data);
-            })
-            .catch((error) => {
-                console.error("Error fetching notifications:", error);
-            });
+        getNotifications().then((data) => {
+            setNotifications(data as Notification[]);
+        });
     }, []);
-
 
     // Filter to only unread notifications
     const unreadNotifications = notifications.filter((n) => !n.read);
@@ -47,28 +55,20 @@ export function Notifications() {
     const unreadCount = unreadNotifications.length;
 
     const handleMarkAsRead = async (id: string) => {
-        try {
-            await markAsRead(id);
-            setNotifications((prev) =>
-                prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-            );
-        } catch (error) {
-            console.error("Error marking notification as read:", error);
-        }
+        await markAsRead(id);
+        setNotifications((prev) =>
+            prev.map((n) => (n.id === id ? { ...n, read: true } : n))
+        );
     };
 
     const handleMarkAllAsRead = async () => {
-        try {
-            await markAllAsRead();
-            setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-        } catch (error) {
-            console.error("Error marking all notifications as read:", error);
-        }
+        await markAllAsRead();
+        setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     };
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
-                <Button className="ml-auto relative bg-background hover:bg-background">
+                <Button className="ml-auto absolute relative bg-background hover:bg-background">
                     <Bell className="h-5 w-5" />
                     {unreadCount > 0 && (
                         <span className="absolute top-1 right-2 h-3 w-3 rounded-full bg-primary text-[8px] font-medium text-white flex items-center justify-center tabular-nums">
@@ -103,21 +103,14 @@ export function Notifications() {
                     ) : (
                         visibleNotifications.map((notification) => {
                             const Icon = typeIcons[notification.type];
-                            const handleNotificationClick = async () => {
-                                await handleMarkAsRead(notification.id);
-                                if (notification.link) {
-                                    setIsOpen(false);
-                                    router.push(notification.link);
-                                }
-                            };
                             return (
                                 <div
                                     key={notification.id}
                                     className={cn(
-                                        "flex gap-2 p-2 bg-muted/50 cursor-pointer transition-colors border-b last:border-b-0 hover:bg-muted",
+                                        "flex gap-2 p-2 bg-muted/50 cursor-pointer transition-colors border-b last:border-b-0",
                                         !notification.read && "bg-muted/30"
                                     )}
-                                    onClick={handleNotificationClick}
+                                    onClick={() => handleMarkAsRead(notification.id)}
                                 >
                                     <div className={cn("mt-0.5", typeColors[notification.type])}>
                                         <Icon className="h-3 w-3" />
