@@ -466,7 +466,7 @@ export default function AppDetailsDashboard({ id }: { id: string }) {
             )}
           </div>
 
-          <div className="hidden lg:grid grid-cols-1 lg:grid-cols-6 gap-9">
+          <div className="hidden lg:grid grid-cols-1 lg:grid-cols-6 gap-9 mt-5">
             <div className="lg:col-span-4 space-y-6">
               <div className="relative aspect-video rounded-lg overflow-hidden border">
                 {data.appDetails.image ? (

@@ -37,7 +37,6 @@ export function Footer() {
         ],
       },
     ],
-    copyright: "© 2025 SmartAppetite Corporation. All Rights Reserved.",
   };
 
   return (
@@ -84,7 +83,10 @@ export function Footer() {
               ))}
             </div>
             <div className="text-muted-foreground mt-24 flex flex-col justify-between gap-4 border-t pt-8 text-sm font-medium md:flex-row md:items-center px-6 mb-5">
-              <p>{INFO.copyright}</p>
+              <p>
+                © {new Date().getFullYear()} SmartAppetite Corporation. All
+                Rights Reserved.
+              </p>
             </div>
           </footer>
         </div>
