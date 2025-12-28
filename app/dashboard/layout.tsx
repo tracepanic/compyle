@@ -22,7 +22,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="m-2 ml-0 overflow-hidden rounded-xl shadow-sm">
-        <header className="flex h-16 shrink-0 items-center gap-2 bg-background">
+        <header className="flex h-16 shrink-0 items-center gap-2 bg-background top-0 fixed w-full z-50">
           <div className="flex items-center gap-2 px-4 border-b w-full pb-2">
             <SidebarTrigger className="-ml-1" />
             <Separator
@@ -32,7 +32,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Breadcrumbs />
           </div>
         </header>
-        <div className="gap-4 p-4 flex-1 overflow-auto container mx-auto">
+        <div className="gap-4 p-4 flex-1 overflow-auto container mx-auto pt-16">
           <LayoutClient>{children}</LayoutClient>
         </div>
       </SidebarInset>
