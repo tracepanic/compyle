@@ -5,6 +5,8 @@ import { notifications } from "@/db/schemas/notification";
 import { auth } from "@/lib/auth"; // Assuming auth import
 import { desc, eq, and } from "drizzle-orm";
 import { headers } from "next/headers";
+import { getUserFromAuth } from "../user";
+
 
 export type Notification = {
   id: string;
@@ -19,93 +21,104 @@ export type Notification = {
 };
 
 export async function getNotifications(): Promise<Notification[]> {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
 
-  if (!session?.user) {
-    return [];
+  try {
+    const user = await getUserFromAuth();
+
+    const result = await db.query.notifications.findMany({
+      where: eq(notifications.userId, user.id),
+      orderBy: [desc(notifications.createdAt)],
+      limit: 50,
+    });
+
+    return result as Notification[];
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Failed to fetch notifications");
   }
-
-  const result = await db.query.notifications.findMany({
-    where: eq(notifications.userId, session.user.id),
-    orderBy: [desc(notifications.createdAt)],
-    limit: 50,
-  });
-
-  return result as Notification[];
 }
 
 export async function markAsRead(notificationId: string) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  try {
+    const user = await getUserFromAuth();
 
-  if (!session?.user) {
-    throw new Error("Unauthorized");
+    await db
+      .update(notifications)
+      .set({ read: true })
+      .where(
+        and(
+          eq(notifications.id, notificationId),
+          eq(notifications.userId, user.id)
+        )
+      );
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Failed to mark notification as read");
   }
-
-  await db
-    .update(notifications)
-    .set({ read: true })
-    .where(
-      and(
-        eq(notifications.id, notificationId),
-        eq(notifications.userId, session.user.id)
-      )
-    );
 }
 
 export async function markAsUnread(notificationId: string) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  try {
+    const user = await getUserFromAuth();
 
-  if (!session?.user) {
-    throw new Error("Unauthorized");
+    await db
+      .update(notifications)
+      .set({ read: false })
+      .where(
+        and(
+          eq(notifications.id, notificationId),
+          eq(notifications.userId, user.id)
+        )
+      );
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Failed to mark notification as unread");
   }
-
-  await db
-    .update(notifications)
-    .set({ read: false })
-    .where(
-      and(
-        eq(notifications.id, notificationId),
-        eq(notifications.userId, session.user.id)
-      )
-    );
 }
 
 export async function markAllAsRead() {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  try {
+    const user = await getUserFromAuth();
 
-  if (!session?.user) {
-    throw new Error("Unauthorized");
+    await db
+      .update(notifications)
+      .set({ read: true })
+      .where(eq(notifications.userId, user.id));
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Failed to mark all notifications as read");
   }
-
-  await db
-    .update(notifications)
-    .set({ read: true })
-    .where(eq(notifications.userId, session.user.id));
 }
 
 export async function deleteNotification(notificationId: string) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
+  try {
+    const user = await getUserFromAuth();
 
-  if (!session?.user) {
-    throw new Error("Unauthorized");
+    await db
+      .delete(notifications)
+      .where(
+        and(
+          eq(notifications.id, notificationId),
+          eq(notifications.userId, user.id)
+        )
+      );
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Failed to delete notification");
   }
-
-  await db
-    .delete(notifications)
-    .where(
-      and(
-        eq(notifications.id, notificationId),
-        eq(notifications.userId, session.user.id)
-      )
-    );
 }
