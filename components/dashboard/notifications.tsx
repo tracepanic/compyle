@@ -1,11 +1,28 @@
-"use client"
-import { useEffect, useState } from "react";
+"use client";
 import { useRouter } from "next/navigation";
-import { Bell, Check, Info, AlertTriangle, AlertCircle, CheckCircle2 } from "lucide-react";
+import {
+    Bell,
+    Check,
+    Info,
+    AlertTriangle,
+    AlertCircle,
+    CheckCircle2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { getNotifications, markAsRead, markAllAsRead, type Notification } from "@/server/actions/notification";
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+    getNotifications,
+    markAsRead,
+    markAllAsRead,
+    type Notification,
+} from "@/server/actions/notification";
 import { cn } from "@/lib/utils";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 const MAX_VISIBLE_NOTIFICATIONS = 3;
 
@@ -25,46 +42,47 @@ const typeColors = {
 
 export function Notifications() {
     const router = useRouter();
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+    const queryClient = useQueryClient();
     const [isOpen, setIsOpen] = useState(false);
 
-    // Fetch notifications on page load
-    useEffect(() => {
-        getNotifications()
-            .then((data) => {
-                setNotifications(data);
-            })
-            .catch((error) => {
-                console.error("Error fetching notifications:", error);
-            });
-    }, []);
+    // Fetch notifications with TanStack Query
+    const { data: notifications = [] } = useQuery({
+        queryKey: ["notifications"],
+        queryFn: getNotifications,
+    });
 
+    // Mark single notification as read mutation
+    const markAsReadMutation = useMutation({
+        mutationFn: markAsRead,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        },
+    });
+    // Mark all as read mutation
+    const markAllAsReadMutation = useMutation({
+        mutationFn: markAllAsRead,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        },
+    });
 
     // Filter to only unread notifications
     const unreadNotifications = notifications.filter((n) => !n.read);
-    const visibleNotifications = unreadNotifications.slice(0, MAX_VISIBLE_NOTIFICATIONS);
+    const visibleNotifications = unreadNotifications.slice(
+        0,
+        MAX_VISIBLE_NOTIFICATIONS
+    );
     const hasMore = unreadNotifications.length > MAX_VISIBLE_NOTIFICATIONS;
     const unreadCount = unreadNotifications.length;
 
     const handleMarkAsRead = async (id: string) => {
-        try {
-            await markAsRead(id);
-            setNotifications((prev) =>
-                prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-            );
-        } catch (error) {
-            console.error("Error marking notification as read:", error);
-        }
+        markAsReadMutation.mutate(id);
     };
 
     const handleMarkAllAsRead = async () => {
-        try {
-            await markAllAsRead();
-            setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-        } catch (error) {
-            console.error("Error marking all notifications as read:", error);
-        }
+        markAllAsReadMutation.mutate();
     };
+
     return (
         <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
@@ -87,6 +105,7 @@ export function Notifications() {
                             size="sm"
                             className="h-auto py-1 px-2 text-xs text-foreground bg-muted/90"
                             onClick={handleMarkAllAsRead}
+                            disabled={markAllAsReadMutation.isPending}
                         >
                             <Check className="size-2.5 mr-1" />
                             Mark all as read

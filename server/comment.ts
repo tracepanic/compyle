@@ -123,22 +123,25 @@ export async function deleteCommentAsAppOwner({
       throw new Error("Not authorized or comment not found");
     }
 
-    await db
-      .update(comments)
-      .set({
-        deletedAt: new Date(),
-        deleter: "appOwner",
-        deletedByUserId: user.id,
-        deleteReason: reason,
-      })
-      .where(eq(comments.id, commentId));
+    // Use transaction to ensure atomicity - both operations succeed or both fail
+    await db.transaction(async (tx) => {
+      await tx
+        .update(comments)
+        .set({
+          deletedAt: new Date(),
+          deleter: "appOwner",
+          deletedByUserId: user.id,
+          deleteReason: reason,
+        })
+        .where(eq(comments.id, commentId));
 
-    await db.insert(notifications).values({
-      userId: result[0].commentUserId,
-      title: "Comment Deleted",
-      message: `Your comment was deleted. Reason: ${reason}`,
-      type: "warning",
-      link: `/dashboard/comments`,
+      await tx.insert(notifications).values({
+        userId: result[0].commentUserId,
+        title: "Comment Deleted",
+        message: `Your comment was deleted. Reason: ${reason}`,
+        type: "warning",
+        link: `/dashboard/comments`,
+      });
     });
 
     return true;

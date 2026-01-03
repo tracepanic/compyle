@@ -1,14 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, Check, Info, AlertTriangle, AlertCircle, CheckCircle2, Trash2, Undo2 } from "lucide-react";
+import {
+    Bell,
+    Check,
+    Info,
+    AlertTriangle,
+    AlertCircle,
+    CheckCircle2,
+    Trash2,
+    Undo2,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getNotifications, markAsRead, markAllAsRead, deleteNotification, markAsUnread, type Notification } from "@/server/actions/notification";
+import {
+    getNotifications,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    markAsUnread,
+    type Notification,
+} from "@/server/actions/notification";
 import { cn } from "@/lib/utils";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 const typeIcons = {
     info: Info,
@@ -32,61 +48,59 @@ const typeBgColors = {
 };
 
 export default function NotificationsPage() {
-    const [notifications, setNotifications] = useState<Notification[]>([]);
-    const [isPending, setIsPending] = useState(true);
+    const queryClient = useQueryClient();
 
-    useEffect(() => {
-        getNotifications()
-            .then((data) => {
-                setNotifications(data as Notification[]);
-            })
-            .finally(() => {
-                setIsPending(false);
-            });
-    }, []);
+    const { data: notifications = [], isLoading: isPending } = useQuery({
+        queryKey: ["notifications"],
+        queryFn: getNotifications,
+    });
+
+    const markAsReadMutation = useMutation({
+        mutationFn: markAsRead,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        },
+    });
+
+    const markAllAsReadMutation = useMutation({
+        mutationFn: markAllAsRead,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        },
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: deleteNotification,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        },
+    });
+
+    const markAsUnreadMutation = useMutation({
+        mutationFn: markAsUnread,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        },
+    });
 
     const unreadNotifications = notifications.filter((n) => !n.read);
     const readNotifications = notifications.filter((n) => n.read);
     const unreadCount = unreadNotifications.length;
 
     const handleMarkAsRead = async (id: string) => {
-        try {
-            await markAsRead(id);
-            setNotifications((prev) =>
-                prev.map((n) => (n.id === id ? { ...n, read: true } : n))
-            );
-        } catch (error) {
-            console.error("Error marking notification as read:", error);
-        }
+        markAsReadMutation.mutate(id);
     };
 
     const handleMarkAllAsRead = async () => {
-        try {
-            await markAllAsRead();
-            setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
-        } catch (error) {
-            console.error("Error marking all notifications as read:", error);
-        }
+        markAllAsReadMutation.mutate();
     };
 
     const handleDelete = async (id: string) => {
-        try {
-            await deleteNotification(id);
-            setNotifications((prev) => prev.filter((n) => n.id !== id));
-        } catch (error) {
-            console.error("Error deleting notification:", error);
-        }
+        deleteMutation.mutate(id);
     };
 
     const handleMarkAsUnread = async (id: string) => {
-        try {
-            await markAsUnread(id);
-            setNotifications((prev) =>
-                prev.map((n) => (n.id === id ? { ...n, read: false } : n))
-            );
-        } catch (error) {
-            console.error("Error marking notification as unread:", error);
-        }
+        markAsUnreadMutation.mutate(id);
     };
 
     const formatTimestamp = (date: Date) => {
@@ -101,7 +115,11 @@ export default function NotificationsPage() {
         return new Date(date).toLocaleDateString();
     };
 
-    const NotificationItem = ({ notification }: { notification: Notification }) => {
+    const NotificationItem = ({
+        notification,
+    }: {
+        notification: Notification;
+    }) => {
         const Icon = typeIcons[notification.type];
         const router = useRouter();
 
@@ -194,7 +212,12 @@ export default function NotificationsPage() {
             <div className="flex items-center justify-between">
                 <h1 className="text-2xl font-bold">Notifications</h1>
                 {unreadCount > 0 && (
-                    <Button variant="outline" size="sm" onClick={handleMarkAllAsRead}>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleMarkAllAsRead}
+                        disabled={markAllAsReadMutation.isPending}
+                    >
                         <Check className="size-4 mr-2" />
                         Mark all as read
                     </Button>

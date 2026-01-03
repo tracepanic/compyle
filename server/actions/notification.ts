@@ -2,11 +2,8 @@
 
 import { db } from "@/db";
 import { notifications } from "@/db/schemas/notification";
-import { auth } from "@/lib/auth"; // Assuming auth import
-import { desc, eq, and } from "drizzle-orm";
-import { headers } from "next/headers";
+import { and, desc, eq } from "drizzle-orm";
 import { getUserFromAuth } from "../user";
-
 
 export type Notification = {
   id: string;
@@ -21,15 +18,15 @@ export type Notification = {
 };
 
 export async function getNotifications(): Promise<Notification[]> {
-
   try {
     const user = await getUserFromAuth();
 
-    const result = await db.query.notifications.findMany({
-      where: eq(notifications.userId, user.id),
-      orderBy: [desc(notifications.createdAt)],
-      limit: 50,
-    });
+    const result = await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, user.id))
+      .orderBy(desc(notifications.createdAt))
+      .limit(50);
 
     return result as Notification[];
   } catch (error) {

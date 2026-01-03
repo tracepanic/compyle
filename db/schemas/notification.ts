@@ -2,6 +2,7 @@ import { notificationTypeEnum } from "@/db/schemas/enums";
 import { timestamps } from "@/db/schemas/timestamps";
 import { users } from "@/db/schemas/user";
 import { createId } from "@paralleldrive/cuid2";
+import { relations } from "drizzle-orm";
 import { boolean, pgTable, text } from "drizzle-orm/pg-core";
 
 export const notifications = pgTable("notification", {
@@ -18,3 +19,10 @@ export const notifications = pgTable("notification", {
     link: text("link"),
     ...timestamps,
 });
+
+export const notificationsRelations = relations(notifications, ({ one }) => ({
+    user: one(users, {
+        fields: [notifications.userId],
+        references: [users.id],
+    }),
+}));
