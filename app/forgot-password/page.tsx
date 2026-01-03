@@ -141,7 +141,7 @@ export default function ForgotPassword() {
             </Field>
           </CardFooter>
 
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-muted-foreground text-sm">
             Remembered your password?{" "}
             <Link href="/login" className="underline">
               Login

@@ -237,7 +237,7 @@ export default function Signup() {
               </Button>
             </Field>
           </CardFooter>
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground">
             Already have an account?{" "}
             <Link href="/login" className="underline">
               Login

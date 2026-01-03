@@ -55,7 +55,9 @@ export function SocialAuth() {
   return (
     <div className="flex flex-col items-center px-5">
       <Separator />
-      <p className="text-center text-muted-foreground mt-4">Or continue with</p>
+      <p className="text-center text-sm text-muted-foreground mt-4">
+        Or continue with
+      </p>
       <Button
         variant="outline"
         onClick={signInWithGithub}

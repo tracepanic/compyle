@@ -1,6 +1,7 @@
 "use client";
 
 import { AppCard } from "@/components/custom/app-card";
+import { AppCardSkeleton } from "@/components/custom/app-card-skeleton";
 import { Button } from "@/components/ui/button";
 import {
   Empty,
@@ -37,8 +38,10 @@ export default function Apps() {
   return (
     <>
       {isPending && (
-        <div className="w-full">
-          <Spinner className="size-6 mx-auto" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <AppCardSkeleton key={i} />
+          ))}
         </div>
       )}
 
@@ -75,20 +78,6 @@ export default function Apps() {
 
       {!isPending && allApps.length > 0 && (
         <>
-          <div className="mb-8">
-            <p className="text-muted-foreground">
-              Showing{" "}
-              <span className="text-foreground font-semibold">
-                {totalCount}
-              </span>{" "}
-              of{" "}
-              <span className="text-foreground font-semibold">
-                {totalCount}
-              </span>{" "}
-              apps
-            </p>
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {allApps.map((app) => {
               const item: AppCardProps = {

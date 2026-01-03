@@ -28,20 +28,9 @@ const data = {
     { title: "Dashboard", url: "/dashboard", icon: House },
     { title: "Comments", url: "/dashboard/comments", icon: MessageCircleMore },
     {
-      title: "Apps",
+      title: "Applications",
       url: "/dashboard/apps",
       icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "Your Apps",
-          url: "/dashboard/apps",
-        },
-        {
-          title: "Create App",
-          url: "/dashboard/apps/new",
-        },
-      ],
     },
     {
       title: "Settings",
