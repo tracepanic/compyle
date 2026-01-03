@@ -320,7 +320,7 @@ export default function AccountSettings() {
       {!isInitialPending && (
         <div className="w-full">
           <Separator />
-          <Card className="mt-2 border-none bg-background max-w-lg">
+          <Card className="mt-2 border-none shadow-background bg-background max-w-lg">
             <CardHeader className="p-0">
               <CardTitle className="text-2xl">Account Information</CardTitle>
             </CardHeader>
@@ -437,7 +437,7 @@ export default function AccountSettings() {
           </Card>
 
           <Separator className="mt-8" />
-          <Card className="mt-2 border-none bg-background max-w-lg">
+          <Card className="mt-2 border-none shadow-background bg-background max-w-lg">
             <CardHeader className="p-0">
               <CardTitle className="text-2xl">Update Password</CardTitle>
               <CardDescription className="max-w-prose">
@@ -528,7 +528,7 @@ export default function AccountSettings() {
           </Card>
 
           <Separator className="mt-8" />
-          <Card className="mt-2 border-none bg-background max-w-lg">
+          <Card className="mt-2 border-none shadow-background bg-background max-w-lg">
             <CardHeader className="p-0">
               <CardTitle className="text-2xl">Account Connections</CardTitle>
             </CardHeader>
@@ -643,11 +643,11 @@ export default function AccountSettings() {
           </Card>
 
           <Separator className="mt-8" />
-          <Card className="mt-2 border-none bg-background">
+          <Card className="mt-2 border-none shadow-none bg-background">
             <CardHeader className="p-0">
               <CardTitle className="text-2xl">Your Sessions</CardTitle>
             </CardHeader>
-            <CardContent className="-mt-2 border rounded-xl p-3">
+            <CardContent className="-mt-2 p-0">
               <Table>
                 <TableHeader>
                   {table.getHeaderGroups().map((headerGroup) => (

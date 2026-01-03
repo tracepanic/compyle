@@ -30,7 +30,7 @@ export const Corner = (props: React.SVGProps<SVGSVGElement>) => {
         y1="2.57422"
         x2="21.5762"
         y2="2.57422"
-        stroke="#FF0000"
+        stroke="currentColor"
         strokeWidth="4"
       />
       <line
@@ -38,7 +38,7 @@ export const Corner = (props: React.SVGProps<SVGSVGElement>) => {
         y1="19.624"
         x2="19.5762"
         y2="4.57422"
-        stroke="#FF0000"
+        stroke="currentColor"
         strokeWidth="4"
       />
     </svg>
