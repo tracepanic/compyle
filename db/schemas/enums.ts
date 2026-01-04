@@ -10,3 +10,10 @@ export const commentDeleterEnum = pgEnum("CommentDeleter", [
   "author",
   "appOwner",
 ]);
+export const notificationTypeEnum = pgEnum("NotificationType", [
+  "info",
+  "success",
+  "warning",
+  "error",
+]);
+
