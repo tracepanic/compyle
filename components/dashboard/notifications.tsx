@@ -23,6 +23,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const MAX_VISIBLE_NOTIFICATIONS = 3;
 
@@ -57,12 +58,19 @@ export function Notifications() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["notifications"] });
         },
+        onError: (error) => {
+            toast.error(error.message || "Failed to mark notification as read");
+        },
     });
+
     // Mark all as read mutation
     const markAllAsReadMutation = useMutation({
         mutationFn: markAllAsRead,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        },
+        onError: (error) => {
+            toast.error(error.message || "Failed to mark all notifications as read");
         },
     });
 

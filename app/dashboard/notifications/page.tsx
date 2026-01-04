@@ -25,6 +25,7 @@ import {
 } from "@/server/actions/notification";
 import { cn } from "@/lib/utils";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 const typeIcons = {
     info: Info,
@@ -60,12 +61,18 @@ export default function NotificationsPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["notifications"] });
         },
+        onError: (error) => {
+            toast.error(error.message || "Failed to mark notification as read");
+        },
     });
 
     const markAllAsReadMutation = useMutation({
         mutationFn: markAllAsRead,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        },
+        onError: (error) => {
+            toast.error(error.message || "Failed to mark all notifications as read");
         },
     });
 
@@ -74,12 +81,18 @@ export default function NotificationsPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["notifications"] });
         },
+        onError: (error) => {
+            toast.error(error.message || "Failed to delete notification");
+        },
     });
 
     const markAsUnreadMutation = useMutation({
         mutationFn: markAsUnread,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ["notifications"] });
+        },
+        onError: (error) => {
+            toast.error(error.message || "Failed to mark notification as unread");
         },
     });
 
