@@ -75,11 +75,11 @@ export function Notifications() {
     const hasMore = unreadNotifications.length > MAX_VISIBLE_NOTIFICATIONS;
     const unreadCount = unreadNotifications.length;
 
-    const handleMarkAsRead = async (id: string) => {
+    const handleMarkAsRead = (id: string) => {
         markAsReadMutation.mutate(id);
     };
 
-    const handleMarkAllAsRead = async () => {
+    const handleMarkAllAsRead = () => {
         markAllAsReadMutation.mutate();
     };
 

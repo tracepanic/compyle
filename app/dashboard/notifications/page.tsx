@@ -87,19 +87,19 @@ export default function NotificationsPage() {
     const readNotifications = notifications.filter((n) => n.read);
     const unreadCount = unreadNotifications.length;
 
-    const handleMarkAsRead = async (id: string) => {
+    const handleMarkAsRead = (id: string) => {
         markAsReadMutation.mutate(id);
     };
 
-    const handleMarkAllAsRead = async () => {
+    const handleMarkAllAsRead = () => {
         markAllAsReadMutation.mutate();
     };
 
-    const handleDelete = async (id: string) => {
+    const handleDelete = (id: string) => {
         deleteMutation.mutate(id);
     };
 
-    const handleMarkAsUnread = async (id: string) => {
+    const handleMarkAsUnread = (id: string) => {
         markAsUnreadMutation.mutate(id);
     };
 
