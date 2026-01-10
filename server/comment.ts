@@ -9,7 +9,6 @@ import { createCommentSchema } from "@/schema/comment.schema";
 import { getUserFromAuth } from "@/server/user";
 import { and, desc, eq, isNotNull, isNull, lt } from "drizzle-orm";
 import z, { ZodError } from "zod";
-import { notifications } from "@/db/schemas/notification";
 
 export async function addComment(
   appId: string,
@@ -105,8 +104,6 @@ export async function deleteCommentAsAppOwner({
     const result = await db
       .select({
         commentId: comments.id,
-        commentUserId: comments.userId,
-        appSlug: apps.slug,
       })
       .from(comments)
       .innerJoin(apps, eq(comments.appId, apps.id))
@@ -123,26 +120,15 @@ export async function deleteCommentAsAppOwner({
       throw new Error("Not authorized or comment not found");
     }
 
-    // Use transaction to ensure atomicity - both operations succeed or both fail
-    await db.transaction(async (tx) => {
-      await tx
-        .update(comments)
-        .set({
-          deletedAt: new Date(),
-          deleter: "appOwner",
-          deletedByUserId: user.id,
-          deleteReason: reason,
-        })
-        .where(eq(comments.id, commentId));
-
-      await tx.insert(notifications).values({
-        userId: result[0].commentUserId,
-        title: "Comment Deleted",
-        message: `Your comment was deleted. Reason: ${reason}`,
-        type: "warning",
-        link: `/dashboard/comments`,
-      });
-    });
+    await db
+      .update(comments)
+      .set({
+        deletedAt: new Date(),
+        deleter: "appOwner",
+        deletedByUserId: user.id,
+        deleteReason: reason,
+      })
+      .where(eq(comments.id, commentId));
 
     return true;
   } catch (error) {

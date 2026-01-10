@@ -5,7 +5,32 @@ import { notifications } from "@/db/schemas/notification";
 import { getUserFromAuth } from "@/server/user";
 import { and, desc, eq } from "drizzle-orm";
 
-export async function getNotifications(): Promise<
+export async function getHeaderNotifications(): Promise<
+  (typeof notifications.$inferSelect)[]
+> {
+  try {
+    const user = await getUserFromAuth();
+
+    const result = await db
+      .select()
+      .from(notifications)
+      .where(
+        and(eq(notifications.userId, user.id), eq(notifications.read, false))
+      )
+      .orderBy(desc(notifications.createdAt))
+      .limit(3);
+
+    return result;
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+
+    throw new Error("Failed to fetch notifications");
+  }
+}
+
+export async function getAllNotifications(): Promise<
   (typeof notifications.$inferSelect)[]
 > {
   try {
@@ -83,7 +108,9 @@ export async function markAllAsRead(): Promise<boolean> {
     await db
       .update(notifications)
       .set({ read: true })
-      .where(eq(notifications.userId, user.id));
+      .where(
+        and(eq(notifications.userId, user.id), eq(notifications.read, false))
+      );
 
     return true;
   } catch (error) {

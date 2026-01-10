@@ -1,30 +1,30 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import {
-  Bell,
-  Check,
-  Info,
-  AlertTriangle,
-  AlertCircle,
-  CheckCircle2,
-  Trash2,
-  Undo2,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  getNotifications,
-  markAsRead,
-  markAllAsRead,
-  deleteNotification,
-  markAsUnread,
-  type Notification,
-} from "@/server/actions/notification";
+import { notifications as notificationSchema } from "@/db/schemas/notification";
 import { cn } from "@/lib/utils";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  deleteNotification,
+  getAllNotifications,
+  markAllAsRead,
+  markAsRead,
+  markAsUnread,
+} from "@/server/notification";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  AlertCircle,
+  AlertTriangle,
+  Bell,
+  Check,
+  CheckCircle2,
+  Info,
+  Trash2,
+  Undo2,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 const typeIcons = {
@@ -53,7 +53,7 @@ export default function NotificationsPage() {
 
   const { data: notifications = [], isLoading: isPending } = useQuery({
     queryKey: ["notifications"],
-    queryFn: getNotifications,
+    queryFn: getAllNotifications,
   });
 
   const markAsReadMutation = useMutation({
@@ -131,14 +131,14 @@ export default function NotificationsPage() {
   const NotificationItem = ({
     notification,
   }: {
-    notification: Notification;
+    notification: typeof notificationSchema.$inferSelect;
   }) => {
     const Icon = typeIcons[notification.type];
     const router = useRouter();
 
-    const handleNotificationClick = async () => {
+    const handleNotificationClick = () => {
       if (!notification.read) {
-        await handleMarkAsRead(notification.id);
+        handleMarkAsRead(notification.id);
       }
       if (notification.link) {
         router.push(notification.link);

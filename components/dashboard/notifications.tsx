@@ -1,94 +1,65 @@
 "use client";
+
 import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
-import {
-  getNotifications,
-  markAllAsRead,
-  markAsRead,
-} from "@/server/actions/notification";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import {
-  AlertCircle,
-  AlertTriangle,
-  Bell,
-  Check,
-  CheckCircle2,
-  Info,
-} from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Spinner } from "@/components/ui/spinner";
+import { queryClient } from "@/providers/query.provider";
+import { markAllAsRead, markAsRead } from "@/server/notification";
+import { useNotificationStore } from "@/store/notification.store";
+import { useMutation } from "@tanstack/react-query";
+import { Bell, CheckCircle2, Dot } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 
-const MAX_VISIBLE_NOTIFICATIONS = 3;
-
-const typeIcons = {
-  info: Info,
-  success: CheckCircle2,
-  warning: AlertTriangle,
-  error: AlertCircle,
-};
-
-const typeColors = {
-  info: "text-blue-300",
-  success: "text-green-300",
-  warning: "text-yellow-300",
-  error: "text-red-300",
-};
-
 export function Notifications() {
-  const router = useRouter();
-  const queryClient = useQueryClient();
+  const { notifications } = useNotificationStore();
+
   const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingIds, setLoadingIds] = useState<string[]>([]);
 
-  // Fetch notifications with TanStack Query
-  const { data: notifications = [] } = useQuery({
-    queryKey: ["notifications"],
-    queryFn: getNotifications,
-  });
-
-  // Mark single notification as read mutation
-  const markAsReadMutation = useMutation({
-    mutationFn: markAsRead,
+  const markNotificationAsReadMutation = useMutation({
+    mutationFn: (notificationId: string) => markAsRead(notificationId),
+    onMutate: (id) => {
+      setLoadingIds((prev) => [...prev, id]);
+    },
+    onSettled: (_, __, id) => {
+      setLoadingIds((prev) => prev.filter((lid) => lid !== id));
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      toast.success("Notification marked as read");
+      queryClient.invalidateQueries({
+        queryKey: ["user-header-dashboard-notifications"],
+      });
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to mark notification as read");
+      toast.error(error.message);
     },
   });
 
-  // Mark all as read mutation
-  const markAllAsReadMutation = useMutation({
+  const markAllNotificationsAsReadMutation = useMutation({
     mutationFn: markAllAsRead,
+    onMutate: () => {
+      setIsLoading(true);
+    },
+    onSettled: () => {
+      setIsLoading(false);
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["notifications"] });
+      toast.success("All notification marked as read");
+      queryClient.invalidateQueries({
+        queryKey: ["user-header-dashboard-notifications"],
+      });
     },
     onError: (error) => {
-      toast.error(error.message || "Failed to mark all notifications as read");
+      toast.error(error.message);
     },
   });
-
-  // Filter to only unread notifications
-  const unreadNotifications = notifications.filter((n) => !n.read);
-  const visibleNotifications = unreadNotifications.slice(
-    0,
-    MAX_VISIBLE_NOTIFICATIONS
-  );
-  const hasMore = unreadNotifications.length > MAX_VISIBLE_NOTIFICATIONS;
-  const unreadCount = unreadNotifications.length;
-
-  const handleMarkAsRead = (id: string) => {
-    markAsReadMutation.mutate(id);
-  };
-
-  const handleMarkAllAsRead = () => {
-    markAllAsReadMutation.mutate();
-  };
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -96,87 +67,72 @@ export function Notifications() {
         <Button
           className="ml-auto relative hover:bg-background cursor-pointer"
           variant="ghost"
-          size="icon"
+          size="icon-lg"
         >
-          <Bell className="h-5 w-5" />
-          {unreadCount > 0 && (
-            <span className="absolute top-1 right-2 h-3 w-3 rounded-full bg-primary text-[8px] font-medium text-white flex items-center justify-center tabular-nums">
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </span>
+          <Bell />
+          {notifications.length > 0 && (
+            <Dot className="absolute size-7 -top-1 -right-1 animate-ping" />
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-[270px] mr-[20px] p-0 mt-[-10px]">
-        {/* Header */}
+
+      <PopoverContent className="w-64 mr-5 p-0 -mt-2.5">
         <div className="flex items-center justify-between p-3 border-b">
           <p className="font-semibold text-base">Notifications</p>
-          {unreadCount > 0 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-auto py-1 px-2 text-xs text-foreground bg-muted/90"
-              onClick={handleMarkAllAsRead}
-              disabled={markAllAsReadMutation.isPending}
-            >
-              <Check className="size-2.5 mr-1" />
-              Mark all as read
-            </Button>
-          )}
+          <Link
+            href="/dashboard/notifications"
+            className="text-sm underline"
+            onClick={() => setIsOpen(false)}
+          >
+            View All
+          </Link>
         </div>
 
-        {/* Notifications List */}
-        <div className="max-h-[250px] overflow-y-auto">
-          {visibleNotifications.length === 0 ? (
+        <div className="max-h-64 overflow-y-auto">
+          {notifications.length === 0 ? (
             <div className="p-3 text-center text-muted-foreground text-sm">
-              No new notifications
+              No new unread notifications
             </div>
           ) : (
-            visibleNotifications.map((notification) => {
-              const Icon = typeIcons[notification.type];
-              const handleNotificationClick = async () => {
-                await handleMarkAsRead(notification.id);
-                if (notification.link) {
-                  setIsOpen(false);
-                  router.push(notification.link);
-                }
-              };
+            notifications.map((n) => {
               return (
                 <div
-                  key={notification.id}
-                  className={cn(
-                    "flex gap-2 p-2 bg-muted/50 cursor-pointer transition-colors border-b last:border-b-0 hover:bg-muted",
-                    !notification.read && "bg-muted/30"
-                  )}
-                  onClick={handleNotificationClick}
+                  key={n.id}
+                  className="flex items-center justify-between p-2 pl-3 border-b last:border-b-0 hover:bg-muted transition-colors select-none"
                 >
-                  <div className={cn("mt-0.5", typeColors[notification.type])}>
-                    <Icon className="h-3 w-3" />
-                  </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {notification.title}
-                    </p>
+                    <p className="text-sm font-medium truncate">{n.title}</p>
                     <p className="text-xs text-muted-foreground line-clamp-2">
-                      {notification.message}
+                      {n.message}
                     </p>
                   </div>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="cursor-pointer"
+                    onClick={() => markNotificationAsReadMutation.mutate(n.id)}
+                  >
+                    {loadingIds.includes(n.id) ? (
+                      <Spinner />
+                    ) : (
+                      <CheckCircle2 size={16} />
+                    )}
+                  </Button>
                 </div>
               );
             })
           )}
         </div>
 
-        {/* View All Button */}
-        {hasMore && (
+        {notifications.length > 0 && (
           <div className="p-2 border-t">
             <Button
               variant="ghost"
-              className="w-full text-sm text-muted-foreground hover:text-foreground"
-              onClick={() => {
-                router.push("/dashboard/notifications");
-              }}
+              className="w-full cursor-pointer"
+              onClick={() => markAllNotificationsAsReadMutation.mutate()}
             >
-              View all notifications
+              {isLoading ? <Spinner /> : <CheckCircle2 />}
+              Mark All As Read
             </Button>
           </div>
         )}
