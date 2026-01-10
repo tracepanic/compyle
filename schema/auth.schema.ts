@@ -23,7 +23,7 @@ export const updateUsernameSchema = z.object({
     .string()
     .regex(
       /^[a-z0-9_]{5,32}$/,
-      "Username must contain only lowercase letters, numbers and underscores.",
+      "Username must contain only lowercase letters, numbers and underscores."
     ),
 });
 
@@ -58,7 +58,7 @@ export const signupSchema = z.object({
     .string()
     .regex(
       /^[a-z0-9_]{5,32}$/,
-      "Username must contain only lowercase letters, numbers and underscores.",
+      "Username must contain only lowercase letters, numbers and underscores."
     ),
   password: z
     .string()

@@ -10,7 +10,7 @@ export const createAppSchema = z.object({
     .string()
     .regex(
       /^[a-z_]+$/,
-      "Slug must contain only lowercase letters and underscores.",
+      "Slug must contain only lowercase letters and underscores."
     ),
   description: z
     .string()
@@ -31,7 +31,7 @@ export const createAppSchema = z.object({
       (techs) =>
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         techs.every((tech) => VALID_TECHNOLOGIES.includes(tech as any)),
-      { message: "Invalid technology selected." },
+      { message: "Invalid technology selected." }
     )
     .refine((techs) => new Set(techs).size === techs.length, {
       message: "Technologies must be unique.",

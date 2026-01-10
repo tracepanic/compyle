@@ -33,7 +33,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Breadcrumbs />
             <Notifications />
           </div>
-
         </header>
         <div className="gap-4 p-4 flex-1 overflow-auto container mx-auto">
           <LayoutClient>{children}</LayoutClient>

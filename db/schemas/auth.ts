@@ -41,7 +41,7 @@ export const accounts = pgTable(
   (table) => [
     index("accounts_userId_idx").on(table.userId),
     index("accounts_providerId_idx").on(table.providerId),
-  ],
+  ]
 );
 
 export const verifications = pgTable(
@@ -55,7 +55,7 @@ export const verifications = pgTable(
     expiresAt: timestamp("expiresAt", { mode: "date" }).notNull(),
     ...timestamps,
   },
-  (table) => [index("verifications_identifier_idx").on(table.identifier)],
+  (table) => [index("verifications_identifier_idx").on(table.identifier)]
 );
 
 export const sessionsRelations = relations(sessions, ({ one }) => ({

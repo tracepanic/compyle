@@ -333,7 +333,7 @@ export function AppDetailsClient({ slug }: { slug: string }) {
                     <span className="font-semibold text-foreground">
                       {format(
                         new Date(app.appDetails.createdAt),
-                        "MMM d, yyyy",
+                        "MMM d, yyyy"
                       )}
                     </span>
                   </div>

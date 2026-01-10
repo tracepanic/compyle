@@ -319,7 +319,7 @@ export default function CreateApp() {
                                     const technology = VALID_TECHNOLOGIES.find(
                                       (t) =>
                                         t.toLowerCase() ===
-                                        currentValue.toLowerCase(),
+                                        currentValue.toLowerCase()
                                     );
                                     if (technology) {
                                       addTech(technology);
@@ -332,7 +332,7 @@ export default function CreateApp() {
                                       "mr-2 h-4 w-4",
                                       selectedTechs.includes(tech)
                                         ? "opacity-100"
-                                        : "opacity-0",
+                                        : "opacity-0"
                                     )}
                                   />
                                   {tech}

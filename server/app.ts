@@ -55,7 +55,7 @@ export async function createApp(params: {
 export async function updateAppDetails(
   values: z.infer<typeof createAppSchema>,
   appId: string,
-  imageData?: ImageData | null,
+  imageData?: ImageData | null
 ): Promise<boolean> {
   try {
     const data = createAppSchema.parse(values);
@@ -71,7 +71,7 @@ export async function updateAppDetails(
 
     if (!currentApp) {
       throw new Error(
-        "App not found or you don't have permission to update it",
+        "App not found or you don't have permission to update it"
       );
     }
 
@@ -172,7 +172,7 @@ export async function deleteApp({
 
     if (!appToDelete) {
       throw new Error(
-        "App not found or you don't have permission to delete it",
+        "App not found or you don't have permission to delete it"
       );
     }
 

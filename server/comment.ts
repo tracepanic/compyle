@@ -13,7 +13,7 @@ import { notifications } from "@/db/schemas/notification";
 
 export async function addComment(
   appId: string,
-  values: z.infer<typeof createCommentSchema>,
+  values: z.infer<typeof createCommentSchema>
 ): Promise<boolean> {
   try {
     if (!appId) {
@@ -66,8 +66,8 @@ export async function deleteOwnComment({
         and(
           eq(comments.id, commentId),
           eq(comments.userId, user.id),
-          isNull(comments.deletedAt),
-        ),
+          isNull(comments.deletedAt)
+        )
       )
       .returning({ id: comments.id });
 
@@ -114,8 +114,8 @@ export async function deleteCommentAsAppOwner({
         and(
           eq(comments.id, commentId),
           eq(apps.userId, user.id),
-          isNull(comments.deletedAt),
-        ),
+          isNull(comments.deletedAt)
+        )
       )
       .limit(1);
 
@@ -184,10 +184,10 @@ export async function getAppComments({
     // Build where conditions using join with apps table
     const whereConditions = cursor
       ? and(
-        eq(apps.slug, appSlug),
-        lt(comments.createdAt, new Date(cursor)),
-        isNull(comments.deletedAt),
-      )
+          eq(apps.slug, appSlug),
+          lt(comments.createdAt, new Date(cursor)),
+          isNull(comments.deletedAt)
+        )
       : and(eq(apps.slug, appSlug), isNull(comments.deletedAt));
 
     const appComments = await db
@@ -269,16 +269,16 @@ export async function getAppCommentsAdmin({
 
     const whereConditions = cursor
       ? and(
-        eq(comments.appId, appId),
-        eq(apps.userId, user.id),
-        lt(comments.createdAt, new Date(cursor)),
-        isNull(comments.deletedAt),
-      )
+          eq(comments.appId, appId),
+          eq(apps.userId, user.id),
+          lt(comments.createdAt, new Date(cursor)),
+          isNull(comments.deletedAt)
+        )
       : and(
-        eq(comments.appId, appId),
-        eq(apps.userId, user.id),
-        isNull(comments.deletedAt),
-      );
+          eq(comments.appId, appId),
+          eq(apps.userId, user.id),
+          isNull(comments.deletedAt)
+        );
 
     const appComments = await db
       .select({
@@ -385,10 +385,10 @@ export async function getDeletedCommentsByAppOwner({
     // Build where conditions for deleted comments by app owner
     const whereConditions = cursor
       ? and(
-        eq(comments.appId, appId),
-        eq(comments.deleter, "appOwner"),
-        lt(comments.deletedAt, new Date(cursor)),
-      )
+          eq(comments.appId, appId),
+          eq(comments.deleter, "appOwner"),
+          lt(comments.deletedAt, new Date(cursor))
+        )
       : and(eq(comments.appId, appId), eq(comments.deleter, "appOwner"));
 
     const deletedComments = await db
@@ -562,7 +562,7 @@ export async function getUserDeletedCommentsDashboard(): Promise<
 }
 
 export async function permanentlyDeleteOldComments(
-  cronSecret: string,
+  cronSecret: string
 ): Promise<{
   success: boolean;
   count: number;
@@ -588,8 +588,8 @@ export async function permanentlyDeleteOldComments(
         and(
           isNotNull(comments.deletedAt),
           isNotNull(comments.deleter),
-          lt(comments.deletedAt, thirtyDaysAgo),
-        ),
+          lt(comments.deletedAt, thirtyDaysAgo)
+        )
       )
       .returning({ id: comments.id });
 

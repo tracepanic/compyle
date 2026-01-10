@@ -16,4 +16,3 @@ export const notificationTypeEnum = pgEnum("NotificationType", [
   "warning",
   "error",
 ]);
-

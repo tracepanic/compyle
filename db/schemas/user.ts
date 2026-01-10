@@ -15,7 +15,7 @@ export const users = pgTable("user", {
   about: text("about")
     .notNull()
     .default(
-      "Building with Compyle AI. Sharing ideas and learning from the community.",
+      "Building with Compyle AI. Sharing ideas and learning from the community."
     ),
   email: text("email").notNull().unique(),
   emailVerified: boolean("emailVerified").notNull().default(false),

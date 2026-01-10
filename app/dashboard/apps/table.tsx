@@ -41,7 +41,7 @@ type AppWithUpvotes = {
 export const columns = (
   onUpdateStatus: (data: { appId: string; status: AppPublishStatus }) => void,
   onDeleteApp: (appId: string) => void,
-  isDeleting: boolean,
+  isDeleting: boolean
 ): ColumnDef<AppWithUpvotes>[] => [
   {
     accessorKey: "app.name",
@@ -128,7 +128,7 @@ const ActionsCell = ({
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [statusOpen, setStatusOpen] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState<AppPublishStatus>(
-    app.status as AppPublishStatus,
+    app.status as AppPublishStatus
   );
 
   const handleUpdateStatus = () => {

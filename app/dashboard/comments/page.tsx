@@ -90,7 +90,7 @@ export default function Page() {
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [isDeletedSheetOpen, setIsDeletedSheetOpen] = useState(false);
   const [selectedComment, setSelectedComment] = useState<ActiveComment | null>(
-    null,
+    null
   );
   const [selectedDeletedComment, setSelectedDeletedComment] =
     useState<DeletedComment | null>(null);
@@ -192,7 +192,7 @@ export default function Page() {
                             ? null
                             : flexRender(
                                 header.column.columnDef.header,
-                                header.getContext(),
+                                header.getContext()
                               )}
                         </TableHead>
                       ))}
@@ -225,7 +225,7 @@ export default function Page() {
                           <TableCell key={cell.id}>
                             {flexRender(
                               cell.column.columnDef.cell,
-                              cell.getContext(),
+                              cell.getContext()
                             )}
                           </TableCell>
                         ))}
@@ -275,7 +275,7 @@ export default function Page() {
                             ? null
                             : flexRender(
                                 header.column.columnDef.header,
-                                header.getContext(),
+                                header.getContext()
                               )}
                         </TableHead>
                       ))}
@@ -307,7 +307,7 @@ export default function Page() {
                           <TableCell key={cell.id}>
                             {flexRender(
                               cell.column.columnDef.cell,
-                              cell.getContext(),
+                              cell.getContext()
                             )}
                           </TableCell>
                         ))}
@@ -360,7 +360,7 @@ export default function Page() {
                 <p className="text-sm text-muted-foreground pl-2">
                   {format(
                     selectedComment.createdAt,
-                    "MMMM d, yyyy 'at' h:mm a",
+                    "MMMM d, yyyy 'at' h:mm a"
                   )}
                 </p>
               </div>
@@ -370,7 +370,7 @@ export default function Page() {
                 <p className="text-sm text-muted-foreground pl-2">
                   {format(
                     selectedComment.updatedAt,
-                    "MMMM d, yyyy 'at' h:mm a",
+                    "MMMM d, yyyy 'at' h:mm a"
                   )}
                 </p>
               </div>
@@ -460,14 +460,14 @@ export default function Page() {
                 <p className="text-sm text-muted-foreground pl-2">
                   {format(
                     selectedDeletedComment.deletedAt,
-                    "MMMM d, yyyy 'at' h:mm a",
+                    "MMMM d, yyyy 'at' h:mm a"
                   )}
                 </p>
                 <div className="flex items-center gap-2 ml-2 mt-1 flex-wrap">
                   <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     {calculateDaysRemaining(
-                      selectedDeletedComment.deletedAt,
+                      selectedDeletedComment.deletedAt
                     ) === 0
                       ? "Expires today"
                       : `${calculateDaysRemaining(selectedDeletedComment.deletedAt)} day${calculateDaysRemaining(selectedDeletedComment.deletedAt) === 1 ? "" : "s"} until permanent deletion`}

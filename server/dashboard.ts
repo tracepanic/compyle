@@ -87,12 +87,12 @@ export async function getDashboardStats(): Promise<{
         .where(
           and(
             eq(apps.userId, user.id),
-            sql`${upvotes.createdAt} >= NOW() - INTERVAL '6 months'`,
-          ),
+            sql`${upvotes.createdAt} >= NOW() - INTERVAL '6 months'`
+          )
         )
         .groupBy(
           sql`EXTRACT(YEAR FROM ${upvotes.createdAt})`,
-          sql`EXTRACT(MONTH FROM ${upvotes.createdAt})`,
+          sql`EXTRACT(MONTH FROM ${upvotes.createdAt})`
         )
         .$withCache({
           config: { ex: 600 },
@@ -111,12 +111,12 @@ export async function getDashboardStats(): Promise<{
           and(
             eq(apps.userId, user.id),
             isNull(comments.deletedAt),
-            sql`${comments.createdAt} >= NOW() - INTERVAL '6 months'`,
-          ),
+            sql`${comments.createdAt} >= NOW() - INTERVAL '6 months'`
+          )
         )
         .groupBy(
           sql`EXTRACT(YEAR FROM ${comments.createdAt})`,
-          sql`EXTRACT(MONTH FROM ${comments.createdAt})`,
+          sql`EXTRACT(MONTH FROM ${comments.createdAt})`
         )
         .$withCache({
           config: { ex: 600 },
@@ -132,33 +132,33 @@ export async function getDashboardStats(): Promise<{
     const totalApps = appsStats[0]?.total || 0;
     const appsGrowth = calculateGrowth(
       appsStats[0]?.lastMonth || 0,
-      appsStats[0]?.previousMonth || 0,
+      appsStats[0]?.previousMonth || 0
     );
 
     const totalUpvotes = upvotesStats[0]?.total || 0;
     const upvotesGrowth = calculateGrowth(
       upvotesStats[0]?.lastMonth || 0,
-      upvotesStats[0]?.previousMonth || 0,
+      upvotesStats[0]?.previousMonth || 0
     );
 
     const totalComments = commentsStats[0]?.total || 0;
     const commentsGrowth = calculateGrowth(
       commentsStats[0]?.lastMonth || 0,
-      commentsStats[0]?.previousMonth || 0,
+      commentsStats[0]?.previousMonth || 0
     );
 
     const upvotesMap = new Map(
       upvotesOverTimeResult.map((item) => [
         `${item.year}-${item.month}`,
         item.upvotes,
-      ]),
+      ])
     );
 
     const commentsMap = new Map(
       commentsOverTimeResult.map((item) => [
         `${item.year}-${item.month}`,
         item.comments,
-      ]),
+      ])
     );
 
     const upvotesOverTime = Array.from({ length: 6 }, (_, i) => {
