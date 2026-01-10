@@ -51,7 +51,7 @@ export function Notifications() {
       setIsLoading(false);
     },
     onSuccess: () => {
-      toast.success("All notification marked as read");
+      toast.success("All notifications marked as read");
       queryClient.invalidateQueries({
         queryKey: ["user-header-dashboard-notifications"],
       });
@@ -65,7 +65,7 @@ export function Notifications() {
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <Button
-          className="ml-auto relative hover:bg-background cursor-pointer"
+          className="ml-auto relative hover:bg-background cursor-pointer md:-translate-x-64"
           variant="ghost"
           size="icon-lg"
         >
