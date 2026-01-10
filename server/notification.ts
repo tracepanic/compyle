@@ -2,22 +2,12 @@
 
 import { db } from "@/db";
 import { notifications } from "@/db/schemas/notification";
+import { getUserFromAuth } from "@/server/user";
 import { and, desc, eq } from "drizzle-orm";
-import { getUserFromAuth } from "../user";
 
-export type Notification = {
-  id: string;
-  userId: string;
-  title: string;
-  message: string;
-  read: boolean;
-  type: "info" | "success" | "warning" | "error";
-  link: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-export async function getNotifications(): Promise<Notification[]> {
+export async function getNotifications(): Promise<
+  (typeof notifications.$inferSelect)[]
+> {
   try {
     const user = await getUserFromAuth();
 
@@ -28,7 +18,7 @@ export async function getNotifications(): Promise<Notification[]> {
       .orderBy(desc(notifications.createdAt))
       .limit(50);
 
-    return result as Notification[];
+    return result;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -38,7 +28,7 @@ export async function getNotifications(): Promise<Notification[]> {
   }
 }
 
-export async function markAsRead(notificationId: string) {
+export async function markAsRead(notificationId: string): Promise<boolean> {
   try {
     const user = await getUserFromAuth();
 
@@ -51,6 +41,8 @@ export async function markAsRead(notificationId: string) {
           eq(notifications.userId, user.id)
         )
       );
+
+    return true;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -60,7 +52,7 @@ export async function markAsRead(notificationId: string) {
   }
 }
 
-export async function markAsUnread(notificationId: string) {
+export async function markAsUnread(notificationId: string): Promise<boolean> {
   try {
     const user = await getUserFromAuth();
 
@@ -73,6 +65,8 @@ export async function markAsUnread(notificationId: string) {
           eq(notifications.userId, user.id)
         )
       );
+
+    return true;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -82,7 +76,7 @@ export async function markAsUnread(notificationId: string) {
   }
 }
 
-export async function markAllAsRead() {
+export async function markAllAsRead(): Promise<boolean> {
   try {
     const user = await getUserFromAuth();
 
@@ -90,6 +84,8 @@ export async function markAllAsRead() {
       .update(notifications)
       .set({ read: true })
       .where(eq(notifications.userId, user.id));
+
+    return true;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
@@ -99,7 +95,9 @@ export async function markAllAsRead() {
   }
 }
 
-export async function deleteNotification(notificationId: string) {
+export async function deleteNotification(
+  notificationId: string
+): Promise<boolean> {
   try {
     const user = await getUserFromAuth();
 
@@ -111,6 +109,8 @@ export async function deleteNotification(notificationId: string) {
           eq(notifications.userId, user.id)
         )
       );
+
+    return true;
   } catch (error) {
     if (error instanceof Error) {
       throw new Error(error.message);
