@@ -37,7 +37,7 @@ export function OurProcess() {
         <div className="top-16 col-span-2 h-fit w-fit gap-3 space-y-7 py-8 lg:sticky">
           <div className="relative w-fit text-4xl font-semibold tracking-tight lg:text-6xl">
             <h1 className="w-fit">Our Process</h1>
-            <Asterisk className="absolute -right-2 -top-2 size-5 text-orange-500 md:size-10 lg:-right-14" />
+            <Asterisk className="absolute -right-2 -top-2 size-5 text-primary md:size-10 lg:-right-14" />
           </div>
           <p className="text-foreground/50 text-base">
             From idea to impact, Compyle guides creators through a clear
@@ -50,7 +50,7 @@ export function OurProcess() {
               variant="ghost"
               className="flex items-center justify-start gap-2 cursor-pointer"
             >
-              <CornerDownRight className="text-orange-500" />
+              <CornerDownRight className="text-primary" />
               Try Compyle.ai
             </Button>
           </Link>
@@ -61,7 +61,7 @@ export function OurProcess() {
               key={index}
               className="relative flex flex-col justify-between gap-10 border-t py-8 md:flex-row lg:py-10"
             >
-              <Corner className="absolute right-0 top-4" />
+              <Corner className="absolute right-0 top-4 text-primary" />
 
               <div className="bg-muted flex size-12 items-center justify-center px-4 py-1 tracking-tighter">
                 0{index + 1}

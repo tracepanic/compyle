@@ -173,7 +173,7 @@ export default function Login() {
               </Button>
             </Field>
           </CardFooter>
-          <p className="text-center text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground">
             Don&apos;t have an account?{" "}
             <Link href="/signup" className="underline">
               Signup
@@ -182,7 +182,7 @@ export default function Login() {
 
           <Link
             href="/forgot-password"
-            className="text-muted-foreground underline w-full text-center -mt-2"
+            className="text-muted-foreground text-sm block mx-auto w-fit underline text-center -mt-2"
           >
             Forgot password?
           </Link>

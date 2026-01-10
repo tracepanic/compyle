@@ -16,7 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Spinner } from "@/components/ui/spinner";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthStore } from "@/store/session.store";
 import { ArrowUpRight, Menu } from "lucide-react";
 import Image from "next/image";
@@ -73,15 +73,20 @@ export function Header() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {isInitialPending && !authInfo?.session && (
-              <Spinner className="size-5" />
-            )}
-            {!isInitialPending && !authInfo?.session && (
-              <Button asChild size="sm">
-                <Link href="/login">Login</Link>
-              </Button>
-            )}
-            {!isInitialPending && authInfo?.session && (
+            {isInitialPending ? (
+              <div className="flex gap-2">
+                <Skeleton className="h-9 w-36 rounded-md" />
+              </div>
+            ) : !authInfo?.session ? (
+              <div className="space-x-2">
+                <Button className="py-3" asChild>
+                  <Link href="/login">Log in</Link>
+                </Button>
+                <Button variant="outline" asChild>
+                  <Link href="/signup">Sign up</Link>
+                </Button>
+              </div>
+            ) : (
               <Button asChild size="sm">
                 <Link href="/dashboard">Dashboard</Link>
               </Button>
@@ -160,12 +165,21 @@ export function Header() {
                         </NavigationMenuItem>
                       </NavigationMenuList>
                     </NavigationMenu>
-                    {!isInitialPending && !authInfo?.session && (
-                      <Button asChild size="sm" className="w-full">
-                        <Link href="/login">Login</Link>
-                      </Button>
-                    )}
-                    {!isInitialPending && authInfo?.session && (
+                    {isInitialPending ? (
+                      <div className="space-y-2">
+                        <Skeleton className="h-9 w-full rounded-md" />
+                        <Skeleton className="h-9 w-full rounded-md" />
+                      </div>
+                    ) : !authInfo?.session ? (
+                      <div className="space-y-2">
+                        <Button asChild className="w-full">
+                          <Link href="/login">Log in</Link>
+                        </Button>
+                        <Button asChild variant="outline" className="w-full">
+                          <Link href="/signup">Sign up</Link>
+                        </Button>
+                      </div>
+                    ) : (
                       <Button asChild size="sm" className="w-full">
                         <Link href="/dashboard">Dashboard</Link>
                       </Button>

@@ -9,7 +9,7 @@ import Link from "next/link";
 export function AppCard({ app }: { app: AppCardProps }) {
   return (
     <Link href={`/apps/${app.slug}`}>
-      <div className="h-full p-6 rounded-lg bg-card border border-border hover:border-primary/50 transition-all hover:shadow-xl hover:shadow-primary/10 group cursor-pointer">
+      <div className="h-full p-6 rounded-lg bg-card border border-border transition-all hover:shadow-md hover:shadow-primary/10 group cursor-pointer">
         <div className="w-full h-40 rounded-lg mb-4 overflow-hidden border relative">
           {app.image ? (
             <Image

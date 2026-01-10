@@ -15,6 +15,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import { ChevronRight, type LucideIcon } from "lucide-react";
 import Link from "next/link";
@@ -33,6 +34,8 @@ export function NavMain({
     }[];
   }[];
 }) {
+  const { setOpenMobile } = useSidebar();
+
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
@@ -41,7 +44,7 @@ export function NavMain({
           <Collapsible key={item.title} asChild defaultOpen={item.isActive}>
             <SidebarMenuItem>
               <SidebarMenuButton asChild tooltip={item.title}>
-                <Link href={item.url}>
+                <Link href={item.url} onClick={() => setOpenMobile(false)}>
                   <item.icon />
                   <span>{item.title}</span>
                 </Link>
@@ -59,7 +62,10 @@ export function NavMain({
                       {item.items?.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
-                            <Link href={subItem.url}>
+                            <Link
+                              href={subItem.url}
+                              onClick={() => setOpenMobile(false)}
+                            >
                               <span>{subItem.title}</span>
                             </Link>
                           </SidebarMenuSubButton>
