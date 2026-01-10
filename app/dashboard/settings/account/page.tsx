@@ -122,7 +122,7 @@ export default function AccountSettings() {
       } else {
         queryClient.invalidateQueries({ queryKey: ["your-session"] });
         toast.success(
-          "Email updated successfully. Check your new email inbox to verify it.",
+          "Email updated successfully. Check your new email inbox to verify it."
         );
       }
     },
@@ -208,7 +208,7 @@ export default function AccountSettings() {
   // }, [allAccounts.data?.data]);
 
   const connectedProviders = new Set(
-    (allAccounts.data?.data ?? []).map((a) => a.providerId.toLowerCase()),
+    (allAccounts.data?.data ?? []).map((a) => a.providerId.toLowerCase())
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -658,7 +658,7 @@ export default function AccountSettings() {
                             ? null
                             : flexRender(
                                 header.column.columnDef.header,
-                                header.getContext(),
+                                header.getContext()
                               )}
                         </TableHead>
                       ))}
@@ -681,7 +681,7 @@ export default function AccountSettings() {
                           <TableCell key={cell.id}>
                             {flexRender(
                               cell.column.columnDef.cell,
-                              cell.getContext(),
+                              cell.getContext()
                             )}
                           </TableCell>
                         ))}

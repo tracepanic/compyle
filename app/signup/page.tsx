@@ -59,7 +59,7 @@ export default function Signup() {
             form.reset();
             toast.error(ctx.error.message || "Something went wrong");
           },
-        },
+        }
       );
     },
   });

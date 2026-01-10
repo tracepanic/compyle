@@ -68,7 +68,7 @@ export default function EditAppDetails({ id }: { id: string }) {
   const [comboboxOpen, setComboboxOpen] = useState(false);
   const [imageData, setImageData] = useState<ImageData | null>(null);
   const [initialImageData, setInitialImageData] = useState<ImageData | null>(
-    null,
+    null
   );
 
   const { isPending: isLoadingApp, data: appData } = useQuery({
@@ -412,7 +412,7 @@ export default function EditAppDetails({ id }: { id: string }) {
                                     const technology = VALID_TECHNOLOGIES.find(
                                       (t) =>
                                         t.toLowerCase() ===
-                                        currentValue.toLowerCase(),
+                                        currentValue.toLowerCase()
                                     );
                                     if (technology) {
                                       addTech(technology);
@@ -425,7 +425,7 @@ export default function EditAppDetails({ id }: { id: string }) {
                                       "mr-2 h-4 w-4",
                                       selectedTechs.includes(tech)
                                         ? "opacity-100"
-                                        : "opacity-0",
+                                        : "opacity-0"
                                     )}
                                   />
                                   {tech}

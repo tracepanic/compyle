@@ -2,6 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/ui/theme-provider";
 import { AuthProvider } from "@/providers/auth.provider";
 import { LayoutProvider } from "@/providers/layout.provider";
+import { NotificationProvider } from "@/providers/notification.provider";
 import { QueryProvider } from "@/providers/query.provider";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
@@ -120,10 +121,12 @@ export default function RootLayout({
         >
           <QueryProvider>
             <AuthProvider>
-              <Toaster />
-              <Analytics />
-              <LayoutProvider>{children}</LayoutProvider>
-              <NextTopLoader color="#0326FF" showSpinner={false} />
+              <NotificationProvider>
+                <Toaster />
+                <Analytics />
+                <LayoutProvider>{children}</LayoutProvider>
+                <NextTopLoader color="#0326FF" showSpinner={false} />
+              </NotificationProvider>
             </AuthProvider>
           </QueryProvider>
         </ThemeProvider>

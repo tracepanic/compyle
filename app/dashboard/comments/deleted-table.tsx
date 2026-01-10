@@ -31,7 +31,7 @@ type DeletedComment = {
 };
 
 export const columns = (
-  onViewComment: (comment: DeletedComment) => void,
+  onViewComment: (comment: DeletedComment) => void
 ): ColumnDef<DeletedComment>[] => [
   {
     accessorKey: "content",

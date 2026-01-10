@@ -30,7 +30,8 @@ import { Spinner } from "@/components/ui/spinner";
 import { signOut } from "@/lib/auth-client";
 import { getInitials } from "@/lib/utils";
 import { useAuthStore } from "@/store/session.store";
-import { ChevronsUpDown, LogOut } from "lucide-react";
+import { Bell, ChevronsUpDown, LogOut } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -118,6 +119,12 @@ export function NavUser() {
                 </div>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild className="cursor-pointer">
+              <Link href="/dashboard/notifications">
+                <Bell /> Notifications
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="cursor-pointer"

@@ -31,7 +31,7 @@ export default function ProfileSettings() {
   const [isUpdating, setIsUpdating] = useState(false);
   const [imageData, setImageData] = useState<ImageData | null>(null);
   const [initialImageData, setInitialImageData] = useState<ImageData | null>(
-    null,
+    null
   );
 
   const { data, error, isPending, refetch } = useSession();

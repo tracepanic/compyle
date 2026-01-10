@@ -58,7 +58,7 @@ export default function Login() {
             form.reset();
             toast.error(ctx.error.message || "Something went wrong");
           },
-        },
+        }
       );
     },
   });

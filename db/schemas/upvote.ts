@@ -15,7 +15,7 @@ export const upvotes = pgTable(
       .references(() => apps.id, { onDelete: "cascade" }),
     ...timestamps,
   },
-  (table) => [primaryKey({ columns: [table.userId, table.appId] })],
+  (table) => [primaryKey({ columns: [table.userId, table.appId] })]
 );
 
 export const upvotesRelations = relations(upvotes, ({ one }) => ({

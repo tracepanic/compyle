@@ -48,10 +48,10 @@ export function AppComments({ appId }: { appId: string }) {
   const [showError, setShowError] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [reason, setReason] = useState<DeleteCommentReason | undefined>(
-    undefined,
+    undefined
   );
   const [selectedCommentId, setSelectedCommentId] = useState<string | null>(
-    null,
+    null
   );
 
   // Active comments query

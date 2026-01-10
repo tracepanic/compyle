@@ -33,7 +33,7 @@ export function ImageUploader({
   const [progress, setProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [imageData, setImageData] = useState<ImageData | null>(
-    initialImageData,
+    initialImageData
   );
   const [showFullScreen, setShowFullScreen] = useState(false);
 
@@ -79,7 +79,7 @@ export function ImageUploader({
   };
 
   const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0];
     if (!file) {

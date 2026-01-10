@@ -21,7 +21,7 @@ type ActiveComment = {
 };
 
 export const columns = (
-  onViewComment: (comment: ActiveComment) => void,
+  onViewComment: (comment: ActiveComment) => void
 ): ColumnDef<ActiveComment>[] => [
   {
     accessorKey: "content",

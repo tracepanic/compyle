@@ -94,7 +94,7 @@ export default function Page() {
   const columnWithHandler = columns(
     handleUpdateStatus,
     handleDeleteApp,
-    deleteAppMutation.isPending,
+    deleteAppMutation.isPending
   );
 
   // eslint-disable-next-line react-hooks/incompatible-library
@@ -135,7 +135,7 @@ export default function Page() {
                         ? null
                         : flexRender(
                             header.column.columnDef.header,
-                            header.getContext(),
+                            header.getContext()
                           )}
                     </TableHead>
                   ))}
@@ -165,7 +165,7 @@ export default function Page() {
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
-                          cell.getContext(),
+                          cell.getContext()
                         )}
                       </TableCell>
                     ))}

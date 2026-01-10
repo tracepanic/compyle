@@ -590,7 +590,7 @@ export default function AppDetailsDashboard({ id }: { id: string }) {
                         <p className="text-xs text-foreground truncate group-hover:text-primary transition-colors">
                           {data.appDetails.websiteUrl.replace(
                             /^https?:\/\//,
-                            "",
+                            ""
                           )}
                         </p>
                       </div>
@@ -710,7 +710,7 @@ export default function AppDetailsDashboard({ id }: { id: string }) {
                     <p className="ml-4">
                       {format(
                         new Date(data.appDetails.createdAt),
-                        "MMM d, yyyy",
+                        "MMM d, yyyy"
                       )}
                     </p>
                   </div>
@@ -721,7 +721,7 @@ export default function AppDetailsDashboard({ id }: { id: string }) {
                     <p className="ml-4">
                       {format(
                         new Date(data.appDetails.updatedAt),
-                        "MMM d, yyyy",
+                        "MMM d, yyyy"
                       )}
                     </p>
                   </div>

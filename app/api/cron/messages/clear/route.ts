@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     if (!userAgent.toLowerCase().includes("vercel-cron")) {
       return NextResponse.json(
         { error: "Forbidden: not a Vercel cron" },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -15,7 +15,7 @@ export async function GET(request: NextRequest) {
     if (!authHeader?.startsWith("Bearer ")) {
       return NextResponse.json(
         { error: "Missing or invalid authorization header" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     if (!token) {
       return NextResponse.json(
         { error: "Missing or invalid authorization header" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     console.error("Cron job execution failed:", error);
     return NextResponse.json(
       { error: "Failed to execute cron job" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
