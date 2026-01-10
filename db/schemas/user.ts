@@ -1,6 +1,7 @@
 import { apps } from "@/db/schemas/app";
 import { comments } from "@/db/schemas/comment";
 import { userRoleEnum } from "@/db/schemas/enums";
+import { notifications } from "@/db/schemas/notification";
 import { timestamps } from "@/db/schemas/timestamps";
 import { upvotes } from "@/db/schemas/upvote";
 import { createId } from "@paralleldrive/cuid2";
@@ -30,6 +31,7 @@ export const users = pgTable("user", {
 export const usersRelations = relations(users, ({ many }) => ({
   apps: many(apps),
   upvotes: many(upvotes),
+  notifications: many(notifications),
   commentsAuthored: many(comments, {
     relationName: "commentAuthor",
   }),
