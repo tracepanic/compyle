@@ -1,27 +1,26 @@
 "use client";
-import { useRouter } from "next/navigation";
-import {
-  Bell,
-  Check,
-  Info,
-  AlertTriangle,
-  AlertCircle,
-  CheckCircle2,
-} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 import {
   getNotifications,
-  markAsRead,
   markAllAsRead,
-  type Notification,
+  markAsRead,
 } from "@/server/actions/notification";
-import { cn } from "@/lib/utils";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  AlertCircle,
+  AlertTriangle,
+  Bell,
+  Check,
+  CheckCircle2,
+  Info,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -94,7 +93,11 @@ export function Notifications() {
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button className="ml-auto relative bg-background hover:bg-background">
+        <Button
+          className="ml-auto relative hover:bg-background cursor-pointer"
+          variant="ghost"
+          size="icon"
+        >
           <Bell className="h-5 w-5" />
           {unreadCount > 0 && (
             <span className="absolute top-1 right-2 h-3 w-3 rounded-full bg-primary text-[8px] font-medium text-white flex items-center justify-center tabular-nums">
