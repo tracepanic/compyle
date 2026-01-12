@@ -29,10 +29,15 @@ export function NotificationProvider({
   });
 
   useEffect(() => {
+    if (!isEnabled) {
+      setNotifications([]);
+      return;
+    }
+
     if (data) {
       setNotifications(data);
     }
-  }, [data, setNotifications]);
+  }, [data, setNotifications, isEnabled]);
 
   return <>{children}</>;
 }
