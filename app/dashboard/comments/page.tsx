@@ -16,7 +16,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import {
   Sheet,
@@ -168,7 +167,7 @@ export default function Page() {
       <h1 className="text-2xl font-bold">Your Comments</h1>
 
       <Tabs className="mt-6" defaultValue="active">
-        <TabsList>
+        <TabsList className="mb-4 w-full sm:w-fit">
           <TabsTrigger className="cursor-pointer w-40" value="active">
             Active {activeResults.data && `(${activeResults.data.length})`}
           </TabsTrigger>
@@ -177,156 +176,140 @@ export default function Page() {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="active">
-          <Card className="mt-2 bg-background">
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => (
-                        <TableHead
-                          key={header.id}
-                          className="font-semibold text-lg"
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      ))}
-                    </TableRow>
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
                   ))}
-                </TableHeader>
-                <TableBody>
-                  {activeResults.isPending ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={table.getAllColumns().length}
-                        className="min-h-32"
-                      >
-                        <div className="w-full mx-auto">
-                          <Spinner className="mx-auto" />
-                        </div>
+                </TableRow>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {activeResults.isPending ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={table.getAllColumns().length}
+                    className="min-h-32"
+                  >
+                    <div className="w-full mx-auto">
+                      <Spinner className="mx-auto" />
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ) : table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    className="cursor-pointer"
+                    key={row.id}
+                    onClick={() => {
+                      setSelectedComment(row.original);
+                      setIsSheetOpen(true);
+                    }}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                       </TableCell>
-                    </TableRow>
-                  ) : table.getRowModel().rows?.length ? (
-                    table.getRowModel().rows.map((row) => (
-                      <TableRow
-                        className="cursor-pointer"
-                        key={row.id}
-                        onClick={() => {
-                          setSelectedComment(row.original);
-                          setIsSheetOpen(true);
-                        }}
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={table.getAllColumns().length}
-                        className="h-24 text-center text-muted-foreground"
-                      >
-                        No comments found.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={table.getAllColumns().length}
+                    className="h-24 text-center text-muted-foreground"
+                  >
+                    No comments found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </TabsContent>
 
         <TabsContent value="deleted">
-          <Card className="mt-2 bg-background">
-            <CardContent>
-              <Alert className="mb-6">
-                <AlertCircle className="h-4 w-4" />
-                <AlertTitle>
-                  Deleted comments are retained for 30 days
-                </AlertTitle>
-                <AlertDescription>
-                  Comments deleted by you or the app publisher are kept for 30
-                  days to help resolve disputes such as spam allegations or
-                  inappropriate content. After 30 days, they are permanently
-                  removed from our system.
-                </AlertDescription>
-              </Alert>
-              <Table>
-                <TableHeader>
-                  {deletedTable.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => (
-                        <TableHead
-                          key={header.id}
-                          className="font-semibold text-lg"
-                        >
-                          {header.isPlaceholder
-                            ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
-                        </TableHead>
-                      ))}
-                    </TableRow>
+          <Alert className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Deleted comments are retained for 30 days</AlertTitle>
+            <AlertDescription>
+              Comments deleted by you or the app publisher are kept for 30 days
+              to help resolve disputes such as spam allegations or inappropriate
+              content. After 30 days, they are permanently removed from our
+              system.
+            </AlertDescription>
+          </Alert>
+          <Table>
+            <TableHeader>
+              {deletedTable.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
                   ))}
-                </TableHeader>
+                </TableRow>
+              ))}
+            </TableHeader>
 
-                <TableBody>
-                  {deletedResults.isPending ? (
-                    <TableRow>
-                      <TableCell
-                        colSpan={deletedTable.getAllColumns().length}
-                        className="min-h-32"
-                      >
-                        <Spinner className="mx-auto" />
+            <TableBody>
+              {deletedResults.isPending ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={deletedTable.getAllColumns().length}
+                    className="min-h-32"
+                  >
+                    <Spinner className="mx-auto" />
+                  </TableCell>
+                </TableRow>
+              ) : deletedTable.getRowModel().rows.length ? (
+                deletedTable.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setSelectedDeletedComment(row.original);
+                      setIsDeletedSheetOpen(true);
+                    }}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
                       </TableCell>
-                    </TableRow>
-                  ) : deletedTable.getRowModel().rows.length ? (
-                    deletedTable.getRowModel().rows.map((row) => (
-                      <TableRow
-                        key={row.id}
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setSelectedDeletedComment(row.original);
-                          setIsDeletedSheetOpen(true);
-                        }}
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <TableCell key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell
-                        colSpan={deletedTable.getAllColumns().length}
-                        className="h-24 text-center text-muted-foreground"
-                      >
-                        No deleted comments.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={deletedTable.getAllColumns().length}
+                    className="h-24 text-center text-muted-foreground"
+                  >
+                    No deleted comments.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </TabsContent>
       </Tabs>
 

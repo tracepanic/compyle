@@ -18,25 +18,98 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import { signUp } from "@/lib/auth-client";
+import { isUsernameAvailable, signUp } from "@/lib/auth-client";
 import { signupSchema } from "@/schema/auth.schema";
 import { useAuthStore } from "@/store/session.store";
 import { useForm } from "@tanstack/react-form";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 export default function Signup() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [usernameStatus, setUsernameStatus] = useState<{
+    checking: boolean;
+    available: boolean | null;
+    message: string;
+  }>({
+    checking: false,
+    available: null,
+    message: "",
+  });
 
   const { isInitialPending, authInfo } = useAuthStore();
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const checkUsernameAvailability = useCallback(async (username: string) => {
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    if (!username || username.length < 5) {
+      setUsernameStatus({
+        checking: false,
+        available: null,
+        message: "",
+      });
+      return;
+    }
+
+    setUsernameStatus({
+      checking: true,
+      available: null,
+      message: "Checking availability...",
+    });
+
+    debounceTimerRef.current = setTimeout(async () => {
+      try {
+        const { data: response, error } = await isUsernameAvailable({
+          username: username,
+        });
+
+        if (error) {
+          setUsernameStatus({
+            checking: false,
+            available: false,
+            message: "Error checking username",
+          });
+          return;
+        }
+
+        if (response?.available) {
+          setUsernameStatus({
+            checking: false,
+            available: true,
+            message: "Username is available",
+          });
+        } else {
+          setUsernameStatus({
+            checking: false,
+            available: false,
+            message: "Username is already taken",
+          });
+        }
+      } catch {
+        setUsernameStatus({
+          checking: false,
+          available: false,
+          message: "Error checking username",
+        });
+      }
+    }, 1000);
+  }, []);
 
   const form = useForm({
     defaultValues: { name: "", email: "", username: "", password: "" },
     validators: { onSubmit: signupSchema },
     onSubmit: async ({ value }) => {
+      if (usernameStatus.available === false) {
+        toast.error("Please choose an available username");
+        return;
+      }
+
       await signUp.email(
         {
           name: value.name,
@@ -67,6 +140,14 @@ export default function Signup() {
   useEffect(() => {
     if (authInfo?.session) router.replace("/dashboard");
   }, [authInfo?.session, router]);
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, []);
 
   if (authInfo?.session) return null;
 
@@ -164,16 +245,53 @@ export default function Signup() {
                     return (
                       <Field data-invalid={isInvalid}>
                         <FieldLabel htmlFor={field.name}>Username</FieldLabel>
-                        <Input
-                          id={field.name}
-                          name={field.name}
-                          value={field.state.value}
-                          onBlur={field.handleBlur}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          aria-invalid={isInvalid}
-                          placeholder="johndoe"
-                          autoComplete="off"
-                        />
+                        <div className="relative">
+                          <Input
+                            id={field.name}
+                            name={field.name}
+                            value={field.state.value}
+                            onBlur={field.handleBlur}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              field.handleChange(value);
+                              checkUsernameAvailability(value);
+                            }}
+                            aria-invalid={isInvalid}
+                            placeholder="johndoe"
+                            autoComplete="off"
+                          />
+                          {usernameStatus.checking && (
+                            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                              <Spinner className="size-4" />
+                            </div>
+                          )}
+                          {!usernameStatus.checking &&
+                            usernameStatus.available === true && (
+                              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">
+                                ✓
+                              </div>
+                            )}
+                          {!usernameStatus.checking &&
+                            usernameStatus.available === false && (
+                              <div className="absolute right-3 top-1/2 -translate-y-1/2 text-red-500">
+                                ✗
+                              </div>
+                            )}
+                        </div>
+                        {field.state.value.length >= 5 &&
+                          usernameStatus.message && (
+                            <p
+                              className={`text-sm mt-1 ${
+                                usernameStatus.available === true
+                                  ? "text-green-600"
+                                  : usernameStatus.available === false
+                                    ? "text-red-600"
+                                    : "text-muted-foreground"
+                              }`}
+                            >
+                              {usernameStatus.message}
+                            </p>
+                          )}
                         {isInvalid && (
                           <FieldError errors={field.state.meta.errors} />
                         )}
@@ -221,7 +339,14 @@ export default function Signup() {
                 type="button"
                 variant="outline"
                 className="cursor-pointer"
-                onClick={() => form.reset()}
+                onClick={() => {
+                  form.reset();
+                  setUsernameStatus({
+                    checking: false,
+                    available: null,
+                    message: "",
+                  });
+                }}
                 disabled={isLoading}
               >
                 Cancel
@@ -230,7 +355,7 @@ export default function Signup() {
                 type="submit"
                 form="signup-form"
                 className="w-40 cursor-pointer gap-2"
-                disabled={isLoading}
+                disabled={isLoading || usernameStatus.available === false}
               >
                 {isLoading && <Spinner />}
                 {isLoading ? "Loading..." : "Signup"}

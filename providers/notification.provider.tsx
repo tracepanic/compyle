@@ -2,6 +2,7 @@
 
 import { getHeaderNotifications } from "@/server/notification";
 import { useNotificationStore } from "@/store/notification.store";
+import { useAuthStore } from "@/store/session.store";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
@@ -11,10 +12,14 @@ export function NotificationProvider({
   children: React.ReactNode;
 }>) {
   const { setNotifications } = useNotificationStore();
+  const { isInitialPending, authInfo } = useAuthStore();
 
-  const { data, isLoading } = useQuery({
+  const isEnabled = !isInitialPending && Boolean(authInfo?.session);
+
+  const { data } = useQuery({
     queryKey: ["user-header-dashboard-notifications"],
-    queryFn: () => getHeaderNotifications(),
+    queryFn: getHeaderNotifications,
+    enabled: isEnabled,
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
     refetchOnMount: true,
@@ -24,8 +29,10 @@ export function NotificationProvider({
   });
 
   useEffect(() => {
-    setNotifications(data ?? []);
-  }, [data, setNotifications, isLoading]);
+    if (data) {
+      setNotifications(data);
+    }
+  }, [data, setNotifications]);
 
   return <>{children}</>;
 }

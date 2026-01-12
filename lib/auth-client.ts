@@ -22,6 +22,7 @@ export const {
   unlinkAccount,
   changePassword,
   requestPasswordReset,
+  isUsernameAvailable,
   resetPassword,
 } = createAuthClient({
   baseURL: process.env.BETTER_AUTH_URL!, // Look into this env, server client stuff

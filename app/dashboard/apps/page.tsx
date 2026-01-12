@@ -2,7 +2,6 @@
 
 import { columns } from "@/app/dashboard/apps/table";
 import { buttonVariants } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Spinner } from "@/components/ui/spinner";
 import {
   Table,
@@ -25,7 +24,7 @@ import {
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Plus } from "lucide-react";
+import { CirclePlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -110,81 +109,71 @@ export default function Page() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold">Your Apps</h1>
-      <div className="mt-5 flex justify-end">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Your Apps</h1>
         <Link
           href="/dashboard/apps/new"
           className={buttonVariants({ variant: "default" })}
         >
-          <Plus className="mr-2 h-4 w-4" /> Submit New App
+          <CirclePlus className="h-4 w-4" /> Submit New App
         </Link>
       </div>
 
-      <Card className="mt-10 bg-background">
-        <CardContent>
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <TableHead
-                      key={header.id}
-                      className="font-semibold text-lg"
-                    >
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  ))}
-                </TableRow>
+      <Table className="mt-6">
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext()
+                      )}
+                </TableHead>
               ))}
-            </TableHeader>
-            <TableBody>
-              {isPending ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={columnWithHandler.length}
-                    className="min-h-32"
-                  >
-                    <div className="w-full mx-auto">
-                      <Spinner className="mx-auto" />
-                    </div>
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {isPending ? (
+            <TableRow>
+              <TableCell
+                colSpan={columnWithHandler.length}
+                className="min-h-32"
+              >
+                <div className="w-full mx-auto">
+                  <Spinner className="mx-auto" />
+                </div>
+              </TableCell>
+            </TableRow>
+          ) : table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                className="cursor-pointer"
+                key={row.id}
+                onClick={() => navigateToView(row.original.app.id)}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </TableCell>
-                </TableRow>
-              ) : table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    className="cursor-pointer"
-                    key={row.id}
-                    onClick={() => navigateToView(row.original.app.id)}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={columnWithHandler.length}
-                    className="h-24 text-center text-muted-foreground"
-                  >
-                    No submitted apps found.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                ))}
+              </TableRow>
+            ))
+          ) : (
+            <TableRow>
+              <TableCell
+                colSpan={columnWithHandler.length}
+                className="h-24 text-center text-muted-foreground"
+              >
+                No submitted apps found.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 }
