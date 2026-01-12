@@ -105,8 +105,12 @@ export default function Signup() {
     defaultValues: { name: "", email: "", username: "", password: "" },
     validators: { onSubmit: signupSchema },
     onSubmit: async ({ value }) => {
-      if (usernameStatus.available === false) {
-        toast.error("Please choose an available username");
+      if (usernameStatus.available !== true) {
+        toast.error(
+          usernameStatus.checking
+            ? "Please wait while we check username availability"
+            : "Please choose an available username"
+        );
         return;
       }
 

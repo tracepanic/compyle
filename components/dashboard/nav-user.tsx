@@ -42,7 +42,7 @@ export function NavUser() {
 
   const router = useRouter();
   const { authInfo, setAuthState } = useAuthStore();
-  const { isMobile } = useSidebar();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   async function handleLogout() {
     setPending(true);
@@ -121,7 +121,10 @@ export function NavUser() {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild className="cursor-pointer">
-              <Link href="/dashboard/notifications">
+              <Link
+                href="/dashboard/notifications"
+                onClick={() => setOpenMobile(false)}
+              >
                 <Bell /> Notifications
               </Link>
             </DropdownMenuItem>
