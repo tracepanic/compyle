@@ -2,14 +2,7 @@
 
 import { ImageUploader } from "@/components/custom/image";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Command,
   CommandEmpty,
@@ -100,21 +93,16 @@ export default function CreateApp() {
   });
 
   return (
-    <form
-      id="create-app-form"
-      onSubmit={(e) => {
-        e.preventDefault();
-        form.handleSubmit();
-      }}
-    >
+    <div className="space-y-6 w-full">
+      <div className="w-full max-w-3xl mx-auto">
+        <h1 className="text-3xl font-bold">Submit New App</h1>
+        <p className="text-muted-foreground">
+          Launch your applications built with Compyle AI. Fill in the details
+          below to get started.
+        </p>
+      </div>
+
       <Card className="w-full max-w-3xl mx-auto">
-        <CardHeader>
-          <CardTitle className="text-xl">Submit New App</CardTitle>
-          <CardDescription>
-            Launch your applications built with Compyle AI. Fill in the details
-            below to get started.
-          </CardDescription>
-        </CardHeader>
         <CardContent>
           <div className="space-y-6">
             <FieldGroup>
@@ -513,8 +501,8 @@ export default function CreateApp() {
               Cancel
             </Button>
             <Button
-              type="submit"
-              form="create-app-form"
+              type="button"
+              onClick={() => form.handleSubmit()}
               className="w-40 cursor-pointer gap-2"
               disabled={isPending}
             >
@@ -524,6 +512,6 @@ export default function CreateApp() {
           </Field>
         </CardFooter>
       </Card>
-    </form>
+    </div>
   );
 }

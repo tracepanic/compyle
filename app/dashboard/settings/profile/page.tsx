@@ -2,14 +2,7 @@
 
 import { ImageUploader } from "@/components/custom/image";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Field,
   FieldError,
@@ -101,7 +94,14 @@ export default function ProfileSettings() {
   }, [data, error, form, isPending]);
 
   return (
-    <>
+    <div className="space-y-6 w-full">
+      <div className="w-full max-w-3xl mx-auto">
+        <h1 className="text-3xl font-bold">Update Profile</h1>
+        <p className="text-muted-foreground">
+          Update your personal information, avatar, and public profile details.
+        </p>
+      </div>
+
       {isPending && (
         <div className="mt-4 w-full mx-auto">
           <Spinner className="mx-auto size-6" />
@@ -111,20 +111,13 @@ export default function ProfileSettings() {
       {!isPending && (
         <form
           id="update-profile"
-          className="space-y-6 w-full"
+          className="w-full"
           onSubmit={(e) => {
             e.preventDefault();
             form.handleSubmit();
           }}
         >
-          <Card className="w-full max-w-3xl mx-auto">
-            <CardHeader>
-              <CardTitle className="text-xl">Update Profile</CardTitle>
-              <CardDescription>
-                Update your personal information, avatar, and public profile
-                details.
-              </CardDescription>
-            </CardHeader>
+          <Card className="w-full max-w-3xl mx-auto mt-6">
             <CardContent>
               <div className="space-y-6">
                 <FieldGroup>
@@ -215,6 +208,6 @@ export default function ProfileSettings() {
           </Card>
         </form>
       )}
-    </>
+    </div>
   );
 }

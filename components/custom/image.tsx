@@ -290,7 +290,7 @@ export function ImageUploader({
                   width={120}
                   height={120}
                   alt="App image"
-                  className="w-36 h-24 rounded-lg border object-cover hover:opacity-90 transition-opacity cursor-pointer"
+                  className="w-24 h-24 rounded-lg border object-cover hover:opacity-90 transition-opacity cursor-pointer"
                   onClick={handleFullScreen}
                 />
               </div>

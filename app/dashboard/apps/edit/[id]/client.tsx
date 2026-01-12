@@ -2,14 +2,7 @@
 
 import { ImageUploader } from "@/components/custom/image";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import {
   Command,
   CommandEmpty,
@@ -125,32 +118,40 @@ export default function EditAppDetails({ id }: { id: string }) {
     },
   });
 
+  const restoreOriginalData = () => {
+    if (appData?.appDetails) {
+      form.setFieldValue("name", appData.appDetails.name);
+      form.setFieldValue("slug", appData.appDetails.slug);
+      form.setFieldValue("description", appData.appDetails.description);
+      form.setFieldValue("category", appData.appDetails.category);
+      form.setFieldValue("builtWith", appData.appDetails.builtWith || []);
+      form.setFieldValue("websiteUrl", appData.appDetails.websiteUrl || "");
+      form.setFieldValue("repoUrl", appData.appDetails.repoUrl || "");
+      form.setFieldValue("demoUrl", appData.appDetails.demoUrl || "");
+      form.setFieldValue("status", appData.appDetails.status || "published");
+      setImageData(initialImageData);
+    }
+  };
+
   useEffect(() => {
     if (appData?.appDetails) {
       setTimeout(() => {
-        form.setFieldValue("name", appData.appDetails.name);
-        form.setFieldValue("slug", appData.appDetails.slug);
-        form.setFieldValue("description", appData.appDetails.description);
-        form.setFieldValue("category", appData.appDetails.category);
-        form.setFieldValue("builtWith", appData.appDetails.builtWith || []);
-        form.setFieldValue("websiteUrl", appData.appDetails.websiteUrl || "");
-        form.setFieldValue("repoUrl", appData.appDetails.repoUrl || "");
-        form.setFieldValue("demoUrl", appData.appDetails.demoUrl || "");
-        form.setFieldValue("status", appData.appDetails.status || "published");
+        restoreOriginalData();
 
         if (
           appData.appDetails.imageProviderFileId &&
           appData.appDetails.image
         ) {
-          const imageData: ImageData = {
+          const imageInfo: ImageData = {
             image: appData.appDetails.image,
             imageProviderFileId: appData.appDetails.imageProviderFileId,
           };
-          setInitialImageData(imageData);
-          setImageData(imageData);
+          setInitialImageData(imageInfo);
+          setImageData(imageInfo);
         }
       }, 0);
     }
+    // eslint-disable-next-line
   }, [appData, form]);
 
   if (isLoadingApp) {
@@ -191,22 +192,16 @@ export default function EditAppDetails({ id }: { id: string }) {
   }
 
   return (
-    <form
-      id="edit-app-form"
-      className="max-w-4xl space-y-8 mx-auto"
-      onSubmit={(e) => {
-        e.preventDefault();
-        form.handleSubmit();
-      }}
-    >
+    <div className="max-w-4xl space-y-6 mx-auto">
+      <div>
+        <h1 className="text-3xl font-bold">Edit App</h1>
+        <p className="text-muted-foreground">
+          Update the details for your application.
+        </p>
+      </div>
+
       <Card>
-        <CardHeader>
-          <CardTitle className="text-xl">Edit App</CardTitle>
-          <CardDescription>
-            Update the details for your application.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="my-5">
+        <CardContent>
           <div className="space-y-8">
             {/* App Name */}
             <FieldGroup>
@@ -599,17 +594,14 @@ export default function EditAppDetails({ id }: { id: string }) {
               type="button"
               variant="outline"
               className="cursor-pointer"
-              onClick={() => {
-                form.reset();
-                setImageData(initialImageData);
-              }}
+              onClick={restoreOriginalData}
               disabled={isSavingApp}
             >
               Cancel
             </Button>
             <Button
-              type="submit"
-              form="edit-app-form"
+              type="button"
+              onClick={() => form.handleSubmit()}
               className="w-40 cursor-pointer gap-2"
               disabled={isSavingApp}
             >
@@ -619,6 +611,6 @@ export default function EditAppDetails({ id }: { id: string }) {
           </Field>
         </CardFooter>
       </Card>
-    </form>
+    </div>
   );
 }

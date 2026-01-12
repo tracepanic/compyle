@@ -1,7 +1,6 @@
 "use client";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,
@@ -10,15 +9,13 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import { Spinner } from "@/components/ui/spinner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getDashboardStats } from "@/server/dashboard";
 import { useAuthStore } from "@/store/session.store";
 import { useQuery } from "@tanstack/react-query";
 import {
-  AlertCircleIcon,
+  AlertCircle,
   Heart,
   MessageSquare,
-  Plus,
   Rocket,
   TrendingDown,
   TrendingUp,
@@ -30,14 +27,14 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 const upvoteChartConfig = {
   upvotes: {
     label: "Upvotes",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(var(--chart-3))",
   },
 } satisfies ChartConfig;
 
 const commentChartConfig = {
   comments: {
     label: "Comments",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(var(--chart-3))",
   },
 } satisfies ChartConfig;
 
@@ -73,7 +70,7 @@ export default function Page() {
     <div className="space-y-6">
       {authInfo?.user?.emailVerified !== true && (
         <Alert variant="destructive">
-          <AlertCircleIcon />
+          <AlertCircle />
           <AlertTitle>Your email address has not been verified.</AlertTitle>
           <AlertDescription className="inline">
             Please click{" "}
@@ -143,103 +140,74 @@ export default function Page() {
             </Card>
           </div>
 
-          <div className="grid gap-6 lg:grid-cols-3">
-            <Card className="lg:col-span-2 min-w-0">
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Card className="min-w-0">
               <CardHeader>
-                <CardTitle className="text-lg">Performance Overview</CardTitle>
+                <CardTitle className="text-lg">Upvotes Over Time</CardTitle>
               </CardHeader>
               <CardContent className="overflow-x-auto">
-                <Tabs defaultValue="upvotes">
-                  <TabsList>
-                    <TabsTrigger value="upvotes" className="cursor-pointer">
-                      Upvotes
-                    </TabsTrigger>
-                    <TabsTrigger value="comments" className="cursor-pointer">
-                      Comments
-                    </TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="upvotes" className="mt-10">
-                    <ChartContainer
-                      config={upvoteChartConfig}
-                      className="h-52 w-full min-w-72"
-                    >
-                      <BarChart accessibilityLayer data={upvoteData}>
-                        <CartesianGrid vertical={false} />
-                        <XAxis
-                          dataKey="month"
-                          tickLine={false}
-                          axisLine={false}
-                          tickMargin={8}
-                          tickFormatter={(value) => value.slice(0, 3)}
-                          fontSize={12}
-                        />
-                        <YAxis
-                          tickLine={false}
-                          axisLine={false}
-                          tickMargin={8}
-                          fontSize={12}
-                        />
-                        <ChartTooltip
-                          cursor={false}
-                          content={<ChartTooltipContent hideLabel />}
-                        />
-                        <Bar
-                          dataKey="upvotes"
-                          fill="var(--chart-4)"
-                          radius={4}
-                        />
-                      </BarChart>
-                    </ChartContainer>
-                  </TabsContent>
-
-                  <TabsContent value="comments" className="mt-10">
-                    <ChartContainer
-                      config={commentChartConfig}
-                      className="h-52 w-full min-w-72"
-                    >
-                      <BarChart accessibilityLayer data={commentData}>
-                        <CartesianGrid vertical={false} />
-                        <XAxis
-                          dataKey="month"
-                          tickLine={false}
-                          axisLine={false}
-                          tickMargin={8}
-                          tickFormatter={(value) => value.slice(0, 3)}
-                          fontSize={12}
-                        />
-                        <YAxis
-                          tickLine={false}
-                          axisLine={false}
-                          tickMargin={8}
-                          fontSize={12}
-                        />
-                        <ChartTooltip
-                          cursor={false}
-                          content={<ChartTooltipContent hideLabel />}
-                        />
-                        <Bar
-                          dataKey="comments"
-                          fill="var(--chart-4)"
-                          radius={4}
-                        />
-                      </BarChart>
-                    </ChartContainer>
-                  </TabsContent>
-                </Tabs>
+                <ChartContainer
+                  config={upvoteChartConfig}
+                  className="h-52 w-full min-w-72"
+                >
+                  <BarChart accessibilityLayer data={upvoteData}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={8}
+                      tickFormatter={(value) => value.slice(0, 3)}
+                      fontSize={12}
+                    />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={8}
+                      fontSize={12}
+                    />
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                    />
+                    <Bar dataKey="upvotes" fill="var(--chart-3)" radius={4} />
+                  </BarChart>
+                </ChartContainer>
               </CardContent>
             </Card>
 
             <Card className="min-w-0">
               <CardHeader>
-                <CardTitle className="text-lg">Quick Actions</CardTitle>
+                <CardTitle className="text-lg">Comments Over Time</CardTitle>
               </CardHeader>
-              <CardContent className="grid gap-3">
-                <Button className="w-full justify-start" asChild>
-                  <Link href="/dashboard/apps/new">
-                    <Plus className="mr-2 h-4 w-4" />
-                    Submit New App
-                  </Link>
-                </Button>
+              <CardContent className="overflow-x-auto">
+                <ChartContainer
+                  config={commentChartConfig}
+                  className="h-52 w-full min-w-72"
+                >
+                  <BarChart accessibilityLayer data={commentData}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                      dataKey="month"
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={8}
+                      tickFormatter={(value) => value.slice(0, 3)}
+                      fontSize={12}
+                    />
+                    <YAxis
+                      tickLine={false}
+                      axisLine={false}
+                      tickMargin={8}
+                      fontSize={12}
+                    />
+                    <ChartTooltip
+                      cursor={false}
+                      content={<ChartTooltipContent hideLabel />}
+                    />
+                    <Bar dataKey="comments" fill="var(--chart-3)" radius={4} />
+                  </BarChart>
+                </ChartContainer>
               </CardContent>
             </Card>
           </div>
