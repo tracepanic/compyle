@@ -6,7 +6,7 @@ First, run the development server:
 pnpm dev
 ```
 
-To run the email components preview UI:
+To run the email templates preview UI:
 
 ```bash
 pnpm email:dev
