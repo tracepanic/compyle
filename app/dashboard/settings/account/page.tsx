@@ -660,7 +660,7 @@ export default function AccountSettings() {
                     View Active Sessions
                   </Button>
                 </DialogTrigger>
-                <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                <DialogContent className="p-2 max-w-[98vw]! w-[98vw]! md:max-w-[50vw]! md:w-[50vw]! overflow-y-auto">
                   <DialogHeader>
                     <DialogTitle>Your Active Sessions</DialogTitle>
                     <DialogDescription>
@@ -673,10 +673,7 @@ export default function AccountSettings() {
                       {table.getHeaderGroups().map((headerGroup) => (
                         <TableRow key={headerGroup.id}>
                           {headerGroup.headers.map((header) => (
-                            <TableHead
-                              key={header.id}
-                              className="font-semibold"
-                            >
+                            <TableHead key={header.id}>
                               {header.isPlaceholder
                                 ? null
                                 : flexRender(

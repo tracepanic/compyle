@@ -182,7 +182,7 @@ export const columns: ColumnDef<SessionTable>[] = [
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleRevoke}
-                className="bg-destructive cursor-pointer text-destructive-foreground hover:bg-destructive/90"
+                className="cursor-pointer"
               >
                 Revoke Session
               </AlertDialogAction>
