@@ -24,6 +24,7 @@ import {
   EmptyTitle,
 } from "@/components/ui/empty";
 import { Spinner } from "@/components/ui/spinner";
+import { Github } from "@/icons";
 import { deleteApp, getDashboardAppDetails } from "@/server/app";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
@@ -35,7 +36,6 @@ import {
   ExternalLink,
   Eye,
   FileText,
-  Github,
   Globe,
   Heart,
   MessageCircle,
