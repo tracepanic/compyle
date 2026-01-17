@@ -54,11 +54,20 @@ export function NavMain({
           );
 
           return (
-            <Collapsible
-              key={item.title}
-              asChild
-              defaultOpen={item.isActive || isSubActive || isMainActive}
-            >
+           const isMainActive = isExactMatch || isSubRouteMatch;
+           const isSubActive = item.items?.some(
+             (subItem) =>
+               pathname === subItem.url || pathname.startsWith(`${subItem.url}/`)
+           );
+
+           const shouldBeOpen = item.isActive || isSubActive || isMainActive;
+
+           return (
+             <Collapsible
+               key={`${item.title}-${shouldBeOpen}`}
+               asChild
+               defaultOpen={shouldBeOpen}
+             >
               <SidebarMenuItem>
                 <SidebarMenuButton
                   asChild
