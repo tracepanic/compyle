@@ -53,16 +53,8 @@ export function NavMain({
               pathname === subItem.url || pathname.startsWith(`${subItem.url}/`)
           );
 
+          const shouldBeOpen = item.isActive || isSubActive || isMainActive;
           return (
-           const isMainActive = isExactMatch || isSubRouteMatch;
-           const isSubActive = item.items?.some(
-             (subItem) =>
-               pathname === subItem.url || pathname.startsWith(`${subItem.url}/`)
-           );
-
-           const shouldBeOpen = item.isActive || isSubActive || isMainActive;
-
-           return (
              <Collapsible
                key={`${item.title}-${shouldBeOpen}`}
                asChild
