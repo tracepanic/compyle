@@ -1,5 +1,5 @@
 import { comments } from "@/db/schemas/comment";
-import { appStatusEnum } from "@/db/schemas/enums";
+import { appStatusEnum, imageSourceEnum } from "@/db/schemas/enums";
 import { timestamps } from "@/db/schemas/timestamps";
 import { upvotes } from "@/db/schemas/upvote";
 import { users } from "@/db/schemas/user";
@@ -16,6 +16,7 @@ export const apps = pgTable("app", {
   description: text("description").notNull(),
   image: text("image"),
   imageProviderFileId: text("imageProviderFileId"),
+  imageSource: imageSourceEnum("imageSource").notNull().default("imagekit"),
   websiteUrl: text("websiteUrl"),
   repoUrl: text("repoUrl"),
   demoUrl: text("demoUrl"),

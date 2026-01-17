@@ -54,13 +54,14 @@ export const auth = betterAuth({
       create: {
         before: async (user) => {
           if (user.username && user.displayUsername) {
-            return { data: user };
+            return { data: { ...user, imageSource: "none" } };
           } else {
             const username = createId();
             return {
               data: {
                 ...user,
                 username,
+                imageSource: "oauth",
                 displayUsername: username,
               },
             };
@@ -84,6 +85,11 @@ export const auth = betterAuth({
         required: false,
         defaultValue: null,
         input: true,
+      },
+      imageSource: {
+        type: "string",
+        required: false,
+        defaultValue: "imagekit",
       },
       about: {
         type: "string",

@@ -17,13 +17,18 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/session.store";
 import { ArrowUpRight, Menu } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Header() {
+  const pathname = usePathname();
   const { authInfo, isInitialPending } = useAuthStore();
+
+  const isAppsActive = pathname === "/apps" || pathname.startsWith("/apps/");
 
   return (
     <section className="py-4">
@@ -50,7 +55,10 @@ export function Header() {
                     <NavigationMenuLink asChild>
                       <Link
                         href="/apps"
-                        className="flex items-center h-full px-4"
+                        className={cn(
+                          "flex items-center h-full px-4",
+                          isAppsActive ? "bg-muted" : ""
+                        )}
                       >
                         Apps
                       </Link>

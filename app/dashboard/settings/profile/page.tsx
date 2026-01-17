@@ -38,7 +38,8 @@ export default function ProfileSettings() {
       const imageChanged =
         imageData?.image !== initialImageData?.image ||
         imageData?.imageProviderFileId !==
-          initialImageData?.imageProviderFileId;
+          initialImageData?.imageProviderFileId ||
+        imageData?.imageSource !== initialImageData?.imageSource;
 
       // Check if nothing has changed
       if (nameUnchanged && aboutUnchanged && !imageChanged) {
@@ -53,6 +54,7 @@ export default function ProfileSettings() {
         about: value.about,
         image: imageData?.image ?? null,
         imageProviderFileId: imageData?.imageProviderFileId ?? null,
+        imageSource: imageData?.imageSource ?? "none",
       });
 
       toast.dismiss(id);
@@ -80,11 +82,13 @@ export default function ProfileSettings() {
           setInitialImageData(null);
           setImageData(null);
         } else {
-          const imageInfo = {
+          const imageInfo: ImageData = {
             image: data.user.image as string,
             imageProviderFileId: data.user.imageProviderFileId as
               | string
               | undefined,
+            imageSource:
+              (data.user.imageSource as ImageData["imageSource"]) ?? "none",
           };
           setInitialImageData(imageInfo);
           setImageData(imageInfo);

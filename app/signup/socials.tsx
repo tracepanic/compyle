@@ -3,9 +3,8 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
-import { GoogleIcon } from "@/icons";
+import { Github, Google } from "@/icons";
 import { signIn } from "@/lib/auth-client";
-import { Github } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -73,7 +72,7 @@ export function SocialAuth() {
         className="mt-2 w-full cursor-pointer"
         disabled={githubLoading || googleLoading}
       >
-        {googleLoading ? <Spinner /> : <GoogleIcon />}
+        {googleLoading ? <Spinner /> : <Google />}
         {googleLoading ? "Loading..." : "Google"}
       </Button>
     </div>

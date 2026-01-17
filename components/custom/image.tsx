@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -14,7 +24,7 @@ import {
   ImageKitUploadNetworkError,
   upload,
 } from "@imagekit/react";
-import { CircleOff, Maximize2, Trash2, Upload, X } from "lucide-react";
+import { Maximize2, Trash2, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -36,6 +46,7 @@ export function ImageUploader({
     initialImageData
   );
   const [showFullScreen, setShowFullScreen] = useState(false);
+  const [showDeleteAlert, setShowDeleteAlert] = useState(false);
 
   const abortControllerRef = useRef<AbortController | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -48,10 +59,6 @@ export function ImageUploader({
   const updateImageData = (newImageData: ImageData | null) => {
     setImageData(newImageData);
     onImageDataChange(newImageData);
-  };
-
-  const isOAuthImage = (data: ImageData | null): boolean => {
-    return !!(data?.image && !data?.imageProviderFileId);
   };
 
   const authenticator = async () => {
@@ -106,6 +113,10 @@ export function ImageUploader({
     }
 
     isProcessingRef.current = true;
+
+    // Store reference to old image for cleanup
+    const oldImageData = imageData;
+
     setIsUploading(true);
     setProgress(0);
 
@@ -147,10 +158,26 @@ export function ImageUploader({
         return;
       }
 
+      // Update with new image
       updateImageData({
         image: uploadResponse.url,
         imageProviderFileId: uploadResponse.fileId,
+        imageSource: "imagekit",
       });
+
+      // Clean up old ImageKit image if it exists
+      if (
+        oldImageData?.imageSource === "imagekit" &&
+        oldImageData.imageProviderFileId
+      ) {
+        try {
+          await deleteFile({ fileId: oldImageData.imageProviderFileId });
+        } catch {
+          // Silent fail - new image is already uploaded
+          console.error("Failed to delete old image");
+        }
+      }
+
       toast.success("Image uploaded successfully");
     } catch (error) {
       if (error instanceof ImageKitAbortError) {
@@ -186,19 +213,30 @@ export function ImageUploader({
       return;
     }
 
+    // Show confirmation dialog
+    setShowDeleteAlert(true);
+  };
+
+  const confirmDeleteImage = async () => {
+    if (!imageData) return;
+
     isProcessingRef.current = true;
 
-    if (isOAuthImage(imageData)) {
+    // Skip ImageKit deletion for non-ImageKit images
+    if (imageData.imageSource !== "imagekit") {
       updateImageData(null);
       toast.success("Image removed successfully");
       isProcessingRef.current = false;
       return;
     }
 
+    // Only delete from ImageKit if it's an ImageKit image
     const toastId = toast.loading("Deleting image...");
 
     try {
-      await deleteFile({ fileId: imageData.imageProviderFileId! });
+      if (imageData.imageProviderFileId) {
+        await deleteFile({ fileId: imageData.imageProviderFileId });
+      }
       toast.dismiss(toastId);
       toast.success("Image deleted successfully");
       updateImageData(null);
@@ -231,34 +269,14 @@ export function ImageUploader({
             <p className="text-xs text-muted-foreground">
               PNG, JPG, JPEG up to 5MB
             </p>
-            <Input
-              ref={fileInputRef}
-              type="file"
-              accept="image/png, image/jpeg, image/jpg"
-              className="hidden"
-              disabled={isUploading}
-              onChange={handleFileChange}
-            />
-          </div>
-        )}
-
-        {(imageData?.image || isUploading) && (
-          <div className="border-2 border-dashed rounded-lg p-8 text-center hover:border-destructive/50 transition-colors">
-            <CircleOff className="w-8 h-8 mx-auto mb-4 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground mb-2">
-              Only 1 image is allowed for upload
-            </p>
-            <p className="text-xs text-muted-foreground">
-              PNG, JPG, JPEG up to 5MB
-            </p>
           </div>
         )}
 
         {isUploading && (
-          <div className="mt-4 border p-4 rounded-xl">
+          <div>
             <div className="flex flex-row gap-4 justify-between">
               <div className="shrink-0">
-                <div className="w-36 h-24 rounded-lg bg-linear-to-br from-primary/30 via-secondary/20 to-accent/30" />
+                <div className="w-24 h-24 rounded-lg bg-linear-to-br from-primary/30 via-secondary/20 to-accent/30" />
               </div>
               <div className="flex gap-2">
                 <Button
@@ -281,12 +299,12 @@ export function ImageUploader({
           </div>
         )}
 
-        {imageData?.image && (
+        {imageData?.image && !isUploading && (
           <>
-            <div className="flex flex-row gap-4 justify-between mt-4 border p-4 rounded-xl">
+            <div className="flex flex-row gap-4 justify-between">
               <div className="shrink-0">
                 <Image
-                  src={imageData!.image}
+                  src={imageData.image}
                   width={120}
                   height={120}
                   alt="App image"
@@ -307,6 +325,15 @@ export function ImageUploader({
                 <Button
                   type="button"
                   size="icon-sm"
+                  variant="outline"
+                  className="cursor-pointer"
+                  onClick={handleFileSelect}
+                >
+                  <Upload className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  size="icon-sm"
                   variant="destructive"
                   className="cursor-pointer"
                   onClick={handleRemoveImage}
@@ -322,7 +349,7 @@ export function ImageUploader({
                 <DialogTitle className="sr-only">Full Screen Image</DialogTitle>
                 <div className="relative w-full h-full flex items-center justify-center p-4">
                   <Image
-                    src={imageData!.image}
+                    src={imageData.image}
                     fill
                     priority
                     sizes="95vw 95vh"
@@ -332,8 +359,43 @@ export function ImageUploader({
                 </div>
               </DialogContent>
             </Dialog>
+
+            <AlertDialog
+              open={showDeleteAlert}
+              onOpenChange={setShowDeleteAlert}
+            >
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete Image</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Are you sure you want to delete this image? This action
+                    cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="cursor-pointer">
+                    Cancel
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={confirmDeleteImage}
+                    className="w-40 cursor-pointer"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </>
         )}
+
+        <Input
+          ref={fileInputRef}
+          type="file"
+          accept="image/png, image/jpeg, image/jpg"
+          className="hidden"
+          disabled={isUploading}
+          onChange={handleFileChange}
+        />
       </CardContent>
     </Card>
   );

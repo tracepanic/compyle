@@ -1,6 +1,6 @@
 import { apps } from "@/db/schemas/app";
 import { comments } from "@/db/schemas/comment";
-import { userRoleEnum } from "@/db/schemas/enums";
+import { imageSourceEnum, userRoleEnum } from "@/db/schemas/enums";
 import { notifications } from "@/db/schemas/notification";
 import { timestamps } from "@/db/schemas/timestamps";
 import { upvotes } from "@/db/schemas/upvote";
@@ -22,6 +22,7 @@ export const users = pgTable("user", {
   emailVerified: boolean("emailVerified").notNull().default(false),
   image: text("image"),
   imageProviderFileId: text("imageProviderFileId"),
+  imageSource: imageSourceEnum("imageSource").notNull().default("none"),
   role: userRoleEnum("role").notNull().default("user"),
   username: text("username").notNull(),
   displayUsername: text("displayUsername").notNull(),

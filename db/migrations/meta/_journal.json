@@ -127,6 +127,20 @@
       "when": 1768038688130,
       "tag": "0017_worried_husk",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1768581321764,
+      "tag": "0018_heavy_warbound",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1768675245479,
+      "tag": "0019_lazy_catseye",
+      "breakpoints": true
     }
   ]
 }

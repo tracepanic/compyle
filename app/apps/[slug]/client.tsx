@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/empty";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { Github } from "@/icons";
 import { getInitials } from "@/lib/utils";
 import { queryClient } from "@/providers/query.provider";
 import { getPublicAppDetails } from "@/server/app";
@@ -24,7 +25,6 @@ import { format } from "date-fns";
 import {
   AppWindow,
   ExternalLink,
-  Github,
   Globe,
   Heart,
   PlusCircle,

@@ -430,8 +430,9 @@ export default function CreateApp() {
             </FieldGroup>
 
             <FieldGroup>
-              <FieldLabel>Upload Image</FieldLabel>
+              <FieldLabel>Upload Image *</FieldLabel>
               <ImageUploader
+                type="app"
                 onImageDataChange={setImageData}
                 initialImageData={imageData}
               />
