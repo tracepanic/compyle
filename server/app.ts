@@ -35,6 +35,7 @@ export async function createApp(params: {
       ...data,
       userId: user.id,
       image: imageData.image,
+      imageSource: "imagekit",
       imageProviderFileId: imageData.imageProviderFileId,
     });
 

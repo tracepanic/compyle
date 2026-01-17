@@ -144,6 +144,7 @@ export default function EditAppDetails({ id }: { id: string }) {
         ) {
           const imageInfo: ImageData = {
             image: appData.appDetails.image,
+            imageSource: appData.appDetails.imageSource,
             imageProviderFileId: appData.appDetails.imageProviderFileId,
           };
           setInitialImageData(imageInfo);
@@ -530,8 +531,9 @@ export default function EditAppDetails({ id }: { id: string }) {
             </FieldGroup>
 
             <FieldGroup>
-              <FieldLabel>Upload Image</FieldLabel>
+              <FieldLabel>Upload Image *</FieldLabel>
               <ImageUploader
+                type="app"
                 onImageDataChange={setImageData}
                 initialImageData={initialImageData}
               />

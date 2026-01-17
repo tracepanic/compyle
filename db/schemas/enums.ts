@@ -16,3 +16,9 @@ export const notificationTypeEnum = pgEnum("NotificationType", [
   "warning",
   "error",
 ]);
+export const imageSourceEnum = pgEnum("ImageSource", [
+  "oauth",
+  "imagekit",
+  "custom",
+  "none",
+]);

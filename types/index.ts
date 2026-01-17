@@ -14,6 +14,7 @@ export type AppCardProps = {
 export type ImageData = {
   image: string;
   imageProviderFileId?: string;
+  imageSource: "oauth" | "imagekit" | "custom" | "none";
 };
 
 export type AuthInfo = {
