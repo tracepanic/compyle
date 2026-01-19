@@ -4,7 +4,14 @@ const nextSitemapConfig = {
   changefreq: "weekly",
   priority: 0.5,
   generateIndexSitemap: false,
-  exclude: ["/icon.png", "/apple-icon.png", "/manifest.json", "/dashboard/**"],
+  exclude: [
+    "/icon.png",
+    "/icon0.svg",
+    "/icon1.png",
+    "/apple-icon.png",
+    "/manifest.json",
+    "/dashboard/**",
+  ],
 };
 
 export default nextSitemapConfig;
