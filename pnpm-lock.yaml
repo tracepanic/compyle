@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@imagekit/nodejs':
         specifier: ^7.1.1
-        version: 7.1.1
+        version: 7.3.0
       '@imagekit/react':
         specifier: ^5.0.1
         version: 5.0.1(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
@@ -671,8 +671,8 @@ packages:
   '@imagekit/javascript@5.1.0':
     resolution: {integrity: sha512-P12NaxlO6Qu4GROFagX9qgP5kKde236mCu5jJB1cWJ6mPaVdjyk0Mw3ciGIWdKXST/jP1cFqS2ZoBVRSq1SWow==}
 
-  '@imagekit/nodejs@7.1.1':
-    resolution: {integrity: sha512-9ll3r04d4lkpVpO9yzU40kmT6UH0+d8UcYYYesnBML8lTI0ghTnNfwxIPuC8l2vDwVxIPZ8eQr2JlPSQHvRQbw==}
+  '@imagekit/nodejs@7.3.0':
+    resolution: {integrity: sha512-oz7iGYtpfH7ewESGf4VALadnj88PgeNTrDIN0T6tu+y7qI3T3YrPer+2oK616LYOFw2vgPNEP2usA7JCKAq+VA==}
 
   '@imagekit/react@5.0.1':
     resolution: {integrity: sha512-AX1w8ZswnY93QDA/QE1HtoQN2OVc4BsBaxOnL0iZzDnq1xb01Xg2qdLOnIWqMgcK5g/yKxBxZT97hBM2lsmSVQ==}
@@ -4739,7 +4739,7 @@ snapshots:
 
   '@imagekit/javascript@5.1.0': {}
 
-  '@imagekit/nodejs@7.1.1':
+  '@imagekit/nodejs@7.3.0':
     dependencies:
       standardwebhooks: 1.0.0
 
